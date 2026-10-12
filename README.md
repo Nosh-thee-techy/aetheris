@@ -74,7 +74,7 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 **Now:** radar flooded fraction for the labeled places on the 6 May 2024 scene, then the agreement table.
 
-The label log for 4–6 May 2024 is in `backtest/labels.csv`. It contains only places a report named. See `docs/labels.md`.
+The label log for 4–6 May 2024 is in `backtest/labels.csv`. It contains only places a report named. See `docs/labels.md`. Rainfall for that event is one catchment decision, copied onto each labeled zone. Radar fractions are not measured yet, so the agreement table is not published.
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`.
 
