@@ -1,0 +1,12 @@
+.env
+.env.*
+out/
+cache/
+broadcast/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+# Payout rule for the Nyando basin.
+# status stays "unfrozen" until both checks below are written down
+# and this file is committed again with status = "frozen" and a frozen_on date.
+# Do not tune these numbers on the season you report.
+
+status = "unfrozen"
+frozen_on = ""
+
+# Checks still open:
+# 1. Sentinel-1 scene dates over the basin for the candidate flood.
+# 2. One known flood: does the CHIRPS anomaly sit on the plain or upstream?
+#    Lake-level flooding with little new rain is a known miss, not a new attester.
+
+[region]
+name = "Nyando basin, western Kenya"
+hazard = "flood"
+season = ""
+
+[quorum]
+radar_required = true
+corroborators_required = 1
+
+[radar]
+# Starting prior from the v2 sketch. Not tuned. Not a reported result.
+threshold_db = -16.0
+min_flooded_fraction = 0.05
+permanent_water_masked = true
+detects = "open_water_only"
+
+[rainfall]
+# spatial is "same_zone" or "upstream_catchment" after the hydrology check.
+spatial = ""
+catchment_id = ""
+lag_days = ""
+threshold_mm = ""
