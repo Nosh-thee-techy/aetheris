@@ -19,11 +19,15 @@ contract FloodTriggerTest is Test {
     address rainfall = makeAddr("rainfall");
     address pool = makeAddr("pool");
     address stranger = makeAddr("stranger");
+    uint256 bond;
+    uint256 stake;
 
     function setUp() public {
         address[] memory corroborators = new address[](1);
         corroborators[0] = rainfall;
         trigger = new FloodTrigger(RULE, resolver, radar, corroborators, pool);
+        bond = trigger.ATTESTER_BOND();
+        stake = trigger.CHALLENGE_STAKE();
         vm.deal(radar, 1 ether);
         vm.deal(rainfall, 1 ether);
         vm.deal(stranger, 1 ether);
@@ -32,12 +36,12 @@ contract FloodTriggerTest is Test {
 
     function _attestRadar() internal {
         vm.prank(radar);
-        trigger.attest{value: trigger.ATTESTER_BOND()}(ZONE, START, END, EVIDENCE);
+        trigger.attest{value: bond}(ZONE, START, END, EVIDENCE);
     }
 
     function _attestRain() internal {
         vm.prank(rainfall);
-        trigger.attest{value: trigger.ATTESTER_BOND()}(ZONE, START, END, RAIN_EVIDENCE);
+        trigger.attest{value: bond}(ZONE, START, END, RAIN_EVIDENCE);
     }
 
     function _openWindow() internal returns (bytes32 id) {
@@ -83,13 +87,13 @@ contract FloodTriggerTest is Test {
     function test_strangerCannotAttest() public {
         vm.prank(stranger);
         vm.expectRevert(FloodTrigger.NotAttester.selector);
-        trigger.attest{value: trigger.ATTESTER_BOND()}(ZONE, START, END, EVIDENCE);
+        trigger.attest{value: bond}(ZONE, START, END, EVIDENCE);
     }
 
     function test_resolverCannotAttest() public {
         vm.prank(resolver);
         vm.expectRevert(FloodTrigger.NotAttester.selector);
-        trigger.attest{value: trigger.ATTESTER_BOND()}(ZONE, START, END, EVIDENCE);
+        trigger.attest{value: bond}(ZONE, START, END, EVIDENCE);
     }
 
     function test_wrongBondReverts() public {
@@ -102,7 +106,7 @@ contract FloodTriggerTest is Test {
         _attestRadar();
         vm.prank(radar);
         vm.expectRevert(FloodTrigger.AlreadySigned.selector);
-        trigger.attest{value: trigger.ATTESTER_BOND()}(ZONE, START, END, EVIDENCE);
+        trigger.attest{value: bond}(ZONE, START, END, EVIDENCE);
     }
 
     function test_constructorRejectsResolverAsAttester() public {
@@ -142,7 +146,7 @@ contract FloodTriggerTest is Test {
     function test_upholdSlashesChallengerAndReturnsBonds() public {
         bytes32 id = _openWindow();
         vm.prank(stranger);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
 
         vm.prank(resolver);
         trigger.resolve(id, true);
@@ -157,7 +161,7 @@ contract FloodTriggerTest is Test {
     function test_rejectPaysBondsToChallenger() public {
         bytes32 id = _openWindow();
         vm.prank(stranger);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
 
         vm.prank(resolver);
         trigger.resolve(id, false);
@@ -172,7 +176,7 @@ contract FloodTriggerTest is Test {
     function test_expiryFinalizesAndReturnsStake() public {
         bytes32 id = _openWindow();
         vm.prank(stranger);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
 
         uint64 deadline = trigger.getTrigger(id).resolveDeadline;
         vm.warp(deadline);
@@ -189,7 +193,7 @@ contract FloodTriggerTest is Test {
     function test_resolverCannotResolveAfterDeadline() public {
         bytes32 id = _openWindow();
         vm.prank(stranger);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
         vm.warp(trigger.getTrigger(id).resolveDeadline);
 
         vm.prank(resolver);
@@ -200,7 +204,7 @@ contract FloodTriggerTest is Test {
     function test_cannotExpireBeforeDeadline() public {
         bytes32 id = _openWindow();
         vm.prank(stranger);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
         vm.expectRevert(FloodTrigger.ResolveWindowOpen.selector);
         trigger.expire(id);
     }
@@ -210,7 +214,7 @@ contract FloodTriggerTest is Test {
         bytes32 id = trigger.computeId(ZONE, START, END);
         vm.prank(stranger);
         vm.expectRevert(FloodTrigger.NotChallengeable.selector);
-        trigger.challenge{value: trigger.CHALLENGE_STAKE()}(id);
+        trigger.challenge{value: stake}(id);
     }
 
     function test_laterSignatureDoesNotResetWindow() public {
@@ -222,18 +226,19 @@ contract FloodTriggerTest is Test {
         vm.deal(radar, 1 ether);
         vm.deal(rainfall, 1 ether);
         vm.deal(ground, 1 ether);
+        uint256 widerBond = wider.ATTESTER_BOND();
 
         vm.prank(radar);
-        wider.attest{value: wider.ATTESTER_BOND()}(ZONE, START, END, EVIDENCE);
+        wider.attest{value: widerBond}(ZONE, START, END, EVIDENCE);
         vm.prank(rainfall);
-        wider.attest{value: wider.ATTESTER_BOND()}(ZONE, START, END, RAIN_EVIDENCE);
+        wider.attest{value: widerBond}(ZONE, START, END, RAIN_EVIDENCE);
 
         bytes32 id = wider.computeId(ZONE, START, END);
         uint64 opened = wider.getTrigger(id).windowStart;
 
         vm.warp(block.timestamp + 1 hours);
         vm.prank(ground);
-        wider.attest{value: wider.ATTESTER_BOND()}(ZONE, START, END, keccak256("ground"));
+        wider.attest{value: widerBond}(ZONE, START, END, keccak256("ground"));
 
         assertEq(wider.getTrigger(id).windowStart, opened);
         assertEq(wider.getTrigger(id).corroboratorCount, 2);
