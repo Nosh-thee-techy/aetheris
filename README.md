@@ -4,7 +4,7 @@ Parametric flood payouts for the Nyando basin, western Kenya. A payout is allowe
 
 The chain gates the decision. It does not send the money. A watcher may deliver a finalized trigger through the M-PESA sandbox later. Until a trigger is `Finalized`, nothing is payable.
 
-This repository is the build. The rule is **not frozen**. Do not publish precision, recall, or basis risk until `backtest/rule.toml` says `status = "frozen"`.
+This repository is the build. The rule in `backtest/rule.toml` is frozen as of 12 October 2026. The evidence is in `docs/checks.md`. Do not change the catchment, the lag, or the thresholds after the label log is filled.
 
 ## The rule
 
@@ -12,12 +12,12 @@ Radar is mandatory. Rainfall corroborates. Rainfall alone cannot open a trigger.
 
 | Attester | Role | Fires when |
 |---|---|---|
-| Sentinel-1 radar | Hazard | Share of a zone's land pixels that look like new open water is above the frozen fraction |
-| CHIRPS rainfall | Corroboration | Rain over the frozen catchment, with the frozen lag, is above the frozen threshold |
+| Sentinel-1 radar | Hazard | Share of a zone's land pixels that look like new open water is above 0.05, using the untuned -16 dB prior, with permanent water removed |
+| CHIRPS rainfall | Corroboration | The 3-day sum of rain on the Nandi–Tinderet and Kericho–Mau boxes reaches 40 mm, ending on the radar date |
 
 A ground attester is not in this build. A simulated ground signature would look like independence we do not have.
 
-The rainfall geography is still unset. Lowland flood on the Kano plain is often driven by rain on the Nandi and Kericho headwaters, and sometimes by high Lake Victoria levels. `backtest/rule.toml` stays `unfrozen` until one known flood shows where the rain fell. The catchment id and the lag then go into the rule hash with the thresholds.
+The report scene is the Sentinel-1A pass on 6 May 2024. Rainfall is read on the headwaters, not on the flooded zone. Daily CHIRPS in the April 2020 check moved with the plain on the same day, so the lag is zero. A high lake with little new rain is still a miss. The 40 mm line is a round prior, not a fitted cutoff.
 
 ## What a signature means
 
@@ -72,7 +72,7 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 ## Priority
 
-**Now:** scene check, hydrology check, freeze the rule, label log, contract, agreement table.
+**Now:** label log, then the agreement table for the 6 May 2024 scene.
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`.
 
@@ -84,7 +84,8 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 ```text
 contracts/     FloodTrigger, Foundry tests, deploy script
-backtest/      rule.toml, label log, scorer
+backtest/      frozen rule, label log, scorer, scene and rainfall checks
+docs/checks.md eligibility, the 6 May 2024 scene, and the rainfall result
 .github/       tests on push
 ```
 
@@ -112,4 +113,4 @@ python -m unittest backtest.test_score
 
 Deploy reads `RULE_HASH`, `RESOLVER`, `RADAR_ATTESTER`, `RAINFALL_ATTESTER`, and `POOL` from the environment. Do not deploy until `backtest/rule.toml` is frozen and `RULE_HASH` is the hash of that file.
 
-Confirm the hackathon's student-only eligibility before relying on a submission slot.
+Eligibility is still open. The Devpost badge says students only. The written rules also list faculty, startups, and professionals. See `docs/checks.md` before treating a submission slot as safe. The Devpost deadline to plan against is 25 October 2026 at 5:00pm Moscow time.

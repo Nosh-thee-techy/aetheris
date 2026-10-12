@@ -1,35 +1,47 @@
-# Payout rule for the Nyando basin.
-# status stays "unfrozen" until both checks below are written down
-# and this file is committed again with status = "frozen" and a frozen_on date.
-# Do not tune these numbers on the season you report.
+status = "frozen"
+frozen_on = "2026-10-12"
 
-status = "unfrozen"
-frozen_on = ""
-
-# Checks still open:
-# 1. Sentinel-1 scene dates over the basin for the candidate flood.
-# 2. One known flood: does the CHIRPS anomaly sit on the plain or upstream?
-#    Lake-level flooding with little new rain is a known miss, not a new attester.
+# Frozen after docs/checks.md.
+# The radar threshold and fraction are untuned priors. Do not revise them
+# using the 2024 scenes. The rainfall threshold is a round prior, not a
+# cutoff fit to either flood.
 
 [region]
 name = "Nyando basin, western Kenya"
 hazard = "flood"
-season = ""
+season = "2024 long rains"
+report_scene_date = "2024-05-06"
+report_granule = "S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_D2D7"
 
 [quorum]
 radar_required = true
 corroborators_required = 1
 
 [radar]
-# Starting prior from the v2 sketch. Not tuned. Not a reported result.
 threshold_db = -16.0
 min_flooded_fraction = 0.05
 permanent_water_masked = true
 detects = "open_water_only"
 
 [rainfall]
-# spatial is "same_zone" or "upstream_catchment" after the hydrology check.
-spatial = ""
-catchment_id = ""
-lag_days = ""
-threshold_mm = ""
+spatial = "upstream_catchment"
+catchment_id = "nyando-headwaters-box-v1"
+# Daily CHIRPS in April 2020 correlates with the plain at lag 0.
+# A one-day lag was tested and was weaker, so the window ends on the
+# radar acquisition date.
+lag_days = 0
+window_days = 3
+# Sum of the daily catchment values over window_days. Round prior.
+threshold_mm = 40
+
+[rainfall.nandi_tinderet]
+west = 35.05
+south = 0.00
+east = 35.40
+north = 0.25
+
+[rainfall.kericho_mau]
+west = 35.15
+south = -0.45
+east = 35.50
+north = -0.15
