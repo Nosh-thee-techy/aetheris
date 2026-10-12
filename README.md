@@ -72,7 +72,9 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 ## Priority
 
-**Now:** label log, then the agreement table for the 6 May 2024 scene.
+**Now:** radar flooded fraction for the labeled places on the 6 May 2024 scene, then the agreement table.
+
+The label log for 4–6 May 2024 is in `backtest/labels.csv`. It contains only places a report named. See `docs/labels.md`.
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`.
 
@@ -86,6 +88,7 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 contracts/     FloodTrigger, Foundry tests, deploy script
 backtest/      frozen rule, label log, scorer, scene and rainfall checks
 docs/checks.md eligibility, the 6 May 2024 scene, and the rainfall result
+docs/labels.md  places named as flooded on 4–6 May 2024
 .github/       tests on push
 ```
 
