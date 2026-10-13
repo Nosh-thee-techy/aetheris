@@ -1,6 +1,6 @@
 # Checks before the rule froze
 
-These three checks were done on 12 October 2026, before any backtest score. The rule in `backtest/rule.toml` is frozen from this page. Labels are still empty.
+These three checks were done on 12 October 2026, before any backtest score. The rule in `backtest/rule.toml` is frozen from this page. The label log is `docs/labels.md`. The scored table is `docs/agreement.md`. This page is the check that froze the rule.
 
 ## Eligibility
 

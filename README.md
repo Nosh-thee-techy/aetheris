@@ -56,8 +56,8 @@ These are the demo limits, and they stay visible:
 - Labels are `flooded`, `not_flooded`, or `unknown`. A blank label is `unknown`.
 - Unknown zone-weeks are excluded from precision, recall, and basis risk. A trigger that fires on an unknown label is counted as `fired_unknown`, not as a success.
 - The agreement table counts `both_yes`, `radar_only`, `rainfall_only`, `both_no`, and abstentions. Disagreements are the only rows where rainfall changes the outcome.
-- Misses on flooded zones are split into `no_scene`, `below_threshold`, `uncorroborated`, and `rainfall_gap`.
-- Open-water thresholding does not see flood under vegetation. That uncovered hazard is stated beside the table. It is not a third miss bucket the scorer can see.
+- Misses on flooded zones are split into `no_scene`, `below_threshold`, `uncorroborated`, `rainfall_gap`, and `no_geometry`. A missing place outline is `no_geometry`. A missing satellite pass is `no_scene`.
+- Open-water thresholding does not see flood under vegetation. That uncovered hazard is stated beside the table. It is not a miss bucket the scorer can see.
 
 Hold out a whole other season if you tune anything. Neighboring zones share the same flood, so a spatial split leaks. With one season, leave the prior thresholds untouched and say the run is untuned.
 
@@ -72,9 +72,7 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 ## Priority
 
-**Now:** radar flooded fraction for the labeled places on the 6 May 2024 scene, then the agreement table.
-
-The label log for 4–6 May 2024 is in `backtest/labels.csv`. It contains only places a report named. See `docs/labels.md`. Rainfall for that event is one catchment decision, copied onto each labeled zone. Radar fractions are not measured yet, so the agreement table is not published.
+**Now:** the must-path for this event is in the repo. The label log is `backtest/labels.csv` (`docs/labels.md`). Rainfall for 4–6 May 2024 is one catchment decision, 56.7 mm, copied onto each labeled zone. Radar fractions for the 6 May scene are in `backtest/checks/radar_fractions.csv`. The agreement table is `docs/agreement.md`. The quorum fires for Kabonyo Kanyagwal only. There are no dry labels, so that table is not a false-trigger test.
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`.
 
@@ -87,8 +85,9 @@ The label log for 4–6 May 2024 is in `backtest/labels.csv`. It contains only p
 ```text
 contracts/     FloodTrigger, Foundry tests, deploy script
 backtest/      frozen rule, label log, scorer, scene and rainfall checks
-docs/checks.md eligibility, the 6 May 2024 scene, and the rainfall result
-docs/labels.md  places named as flooded on 4–6 May 2024
+docs/checks.md    eligibility, the 6 May 2024 scene, and the rainfall result
+docs/labels.md    places named as flooded on 4–6 May 2024
+docs/agreement.md scored agreement table for that event
 .github/       tests on push
 ```
 

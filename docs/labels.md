@@ -18,3 +18,5 @@ Roads reported impassable in Muhoroni and Nyakach are not flood labels. Onjiko S
 Kenya News Agency says lake backflow made the Ahero flooding worse. That is the lake mode the rainfall rule does not see, sitting inside an otherwise riverine label.
 
 These are news reports. They favour places rescuers and reporters could reach, and they do not draw a flood edge. Household counts are the source's figures, not a surveyed extent.
+
+The scored result for these seven rows is `docs/agreement.md`.
