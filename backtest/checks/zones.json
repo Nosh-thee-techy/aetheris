@@ -1,0 +1,34 @@
+{
+  "ahero": {
+    "west": 34.892,
+    "south": -0.1995,
+    "east": 34.946,
+    "north": -0.1455,
+    "scale": "3 km box around the Ahero town point, not the ward",
+    "source": "OpenStreetMap town node via Nominatim"
+  },
+  "kabonyo-kanyagwal": {
+    "west": 34.7830556,
+    "south": -0.2991309,
+    "east": 34.8940952,
+    "north": -0.1713617,
+    "scale": "OpenStreetMap ward bbox",
+    "source": "Nominatim administrative boundary"
+  },
+  "kobura": {
+    "west": 34.7748744,
+    "south": -0.2095282,
+    "east": 34.9099994,
+    "north": -0.1200152,
+    "scale": "OpenStreetMap ward bbox. The Star named a village; the village point was not found.",
+    "source": "Nominatim administrative boundary"
+  },
+  "ombeyi": {
+    "west": 34.8585428,
+    "south": -0.1725116,
+    "east": 34.9859737,
+    "north": -0.0714171,
+    "scale": "OpenStreetMap ward bbox for the location named in the report",
+    "source": "Nominatim administrative boundary"
+  }
+}

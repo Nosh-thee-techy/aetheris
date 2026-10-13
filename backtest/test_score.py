@@ -133,6 +133,17 @@ class ScoreTest(unittest.TestCase):
                 ]
             )
 
+    def test_missing_place_outline_is_not_a_missing_scene(self):
+        result = score(
+            labels(("a", "flooded")),
+            observations(
+                ("a", "radar", "abstain", "no_geometry"),
+                ("a", "rainfall", "yes", "threshold_met"),
+            ),
+        )
+        self.assertEqual(result["misses"]["no_geometry"], 1)
+        self.assertEqual(result["misses"]["no_scene"], 0)
+
     def test_missing_attester_abstains(self):
         result = score(
             labels(("a", "flooded")),

@@ -1,0 +1,8 @@
+zone_id,decision,reason,flooded_fraction,valid_pixels,land_pixels,flooded_pixels,scale
+ahero,no,below_threshold,0.0066,358797,358797,2370,"3 km box around the Ahero town point, not the ward"
+kabonyo-kanyagwal,yes,threshold_met,0.0893,1746468,1589424,141955,OpenStreetMap ward bbox
+kakola-ombaka,abstain,no_geometry,,,,,no outline that matches the named place
+nyamasao,abstain,no_geometry,,,,,no outline that matches the named place
+ombeyi,no,below_threshold,0.0028,1586442,1586442,4427,OpenStreetMap ward bbox for the location named in the report
+kobura,no,below_threshold,0.0095,1488960,1448140,13746,OpenStreetMap ward bbox. The Star named a village; the village point was not found.
+kadibo,abstain,no_geometry,,,,,no outline that matches the named place

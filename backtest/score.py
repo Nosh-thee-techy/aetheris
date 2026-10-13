@@ -32,6 +32,7 @@ MISS_BUCKETS = (
     "below_threshold",
     "uncorroborated",
     "rainfall_gap",
+    "no_geometry",
 )
 
 
@@ -93,6 +94,13 @@ def _decision(pair: dict[str, dict[str, str]], source: str) -> str:
     return observed["decision"]
 
 
+def _reason(pair: dict[str, dict[str, str]], source: str) -> str:
+    observed = pair.get(source)
+    if observed is None:
+        return "no_data"
+    return observed["reason"]
+
+
 def quorum(radar: str, rainfall: str) -> bool:
     """Radar must see open water, and rainfall must corroborate."""
     return radar == "yes" and rainfall == "yes"
@@ -114,8 +122,10 @@ def agreement_bucket(radar: str, rainfall: str) -> str:
     return "both_no"
 
 
-def miss_bucket(radar: str, rainfall: str) -> str:
+def miss_bucket(radar: str, rainfall: str, radar_reason: str = "") -> str:
     if radar == "abstain":
+        if radar_reason == "no_geometry":
+            return "no_geometry"
         return "no_scene"
     if radar == "no":
         return "below_threshold"
@@ -159,7 +169,7 @@ def score(
                 counts["true_positive"] += 1
             else:
                 counts["miss"] += 1
-                misses[miss_bucket(radar, rainfall)] += 1
+                misses[miss_bucket(radar, rainfall, _reason(pair, "radar"))] += 1
         elif fired:
             counts["false_trigger"] += 1
         else:

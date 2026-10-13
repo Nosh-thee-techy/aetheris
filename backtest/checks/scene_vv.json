@@ -1,0 +1,33 @@
+{
+  "scene_id": "S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_rtc",
+  "vv_href": "https://sentinel1euwestrtc.blob.core.windows.net/sentinel1-grd-rtc/GRD/2024/5/6/IW/DV/S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_0742/measurement/iw-vv.rtc.tiff",
+  "vv_type": "image/tiff; application=geotiff; profile=cloud-optimized",
+  "water_items": [
+    {
+      "id": "30E_10Nv1_3_2020",
+      "assets": [
+        "change",
+        "extent",
+        "occurrence",
+        "recurrence",
+        "rendered_preview",
+        "seasonality",
+        "tilejson",
+        "transitions"
+      ]
+    },
+    {
+      "id": "30E_0Nv1_3_2020",
+      "assets": [
+        "change",
+        "extent",
+        "occurrence",
+        "recurrence",
+        "rendered_preview",
+        "seasonality",
+        "tilejson",
+        "transitions"
+      ]
+    }
+  ]
+}
