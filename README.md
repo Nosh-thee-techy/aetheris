@@ -76,7 +76,7 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`.
 
-**Later:** testnet deploy with separate keys, radar pipeline, rainfall pipeline, sandbox watcher, dashboard.
+**Later:** testnet deploy with the four keys from `python -m backtest.pipeline.keys`, then the dashboard. The radar and rainfall jobs are in `backtest/pipeline`. The watcher stays out.
 
 **Not in this build:** USSD, a simulated ground attester, a resolver multisig, and an on-chain beneficiary table.
 
@@ -91,7 +91,7 @@ docs/agreement.md scored agreement table for that event
 .github/       tests on push
 ```
 
-Attester pipelines, the watcher, and the dashboard are not in the tree yet.
+`backtest/pipeline` is the two attester jobs. Rainfall reads CHIRPS on Earth Engine for a new scene and uses the published 56.7 mm for 6 May 2024. Radar signs only when the frozen RTC fraction clears. The watcher and the dashboard are not in the tree yet.
 
 ## Setup
 
@@ -110,9 +110,13 @@ forge test --root contracts
 Backtest tests use the Python standard library:
 
 ```powershell
-python -m unittest backtest.test_score
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline
 ```
 
-Deploy reads `RULE_HASH`, `RESOLVER`, `RADAR_ATTESTER`, `RAINFALL_ATTESTER`, and `POOL` from the environment. Do not deploy until `backtest/rule.toml` is frozen and `RULE_HASH` is the hash of that file.
+Deploy reads `RULE_HASH`, `RESOLVER`, `RADAR_ATTESTER`, `RAINFALL_ATTESTER`, and `POOL` from the environment. `python -m backtest.pipeline.keys` writes those to `.env`. The resolver key deploys. It is not an attester. `RULE_HASH` is keccak256 of the frozen `backtest/rule.toml` bytes. Copy `.env` into the shell, fund `RESOLVER` on Sepolia, then:
 
-Eligibility is still open. The Devpost badge says students only. The written rules also list faculty, startups, and professionals. See `docs/checks.md` before treating a submission slot as safe. The Devpost deadline to plan against is 25 October 2026 at 5:00pm Moscow time.
+```powershell
+forge script script/Deploy.s.sol --root contracts --rpc-url $env:SEPOLIA_RPC_URL --private-key $env:DEPLOYER_PRIVATE_KEY --broadcast
+```
+
+The person building this is a student, recorded in `docs/checks.md` on 19 October 2026. The Devpost badge and the written rules still disagree, so a second person has to pass the same reading. The Devpost deadline to plan against is 25 October 2026 at 5:00pm Moscow time.
