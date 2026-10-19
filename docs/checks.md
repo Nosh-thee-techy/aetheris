@@ -18,7 +18,7 @@ Devpost's judging criteria have no percentages. They are climate impact, innovat
 
 The deadline Devpost's own schedule will enforce is 25 October 2026 at 5:00pm Moscow time. Submissions open on that schedule at 5 October 2026, 7:00am Moscow time. The rules page also says not to submit before 8:00am Pacific on 25 October, and the organiser page says 25 October at 11:59pm UTC. Those two clocks disagree with the schedule. Submit against the earlier Devpost deadline.
 
-This check does not confirm the people on the team. That still has to be done before a submission is treated as safe.
+On 19 October 2026 the person building this confirmed they are a student and that the safe reading is met for them. The badge and the rules page still disagree. A second person, if one joins, has to pass the same reading.
 
 ## Sentinel-1 season
 
