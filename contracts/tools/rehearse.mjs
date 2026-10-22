@@ -5,7 +5,7 @@
 // It does not replace `forge test`; it is a second, independent check.
 
 import ganache from "ganache";
-import { BrowserProvider, ContractFactory, parseEther, keccak256, toUtf8Bytes } from "ethers";
+import { BrowserProvider, ContractFactory, Interface, parseEther, keccak256, toUtf8Bytes } from "ethers";
 import { compile } from "./compile.mjs";
 import { ruleId, thresholdsHash, zoneId, weekId, evidenceRadar, evidenceRainfall, SCENE_ITEM, WEEK } from "./ids.mjs";
 
@@ -13,9 +13,13 @@ const built = compile();
 const chain = ganache.provider({
   wallet: { totalAccounts: 8, defaultBalance: 1000 },
   logging: { quiet: true },
-  chain: { allowUnlimitedContractSize: false },
+  chain: { allowUnlimitedContractSize: false, vmErrorsOnRPCResponse: true },
 });
 const provider = new BrowserProvider(chain);
+// ganache does not return revert data from eth_estimateGas, so a failing call would
+// show up as "missing revert data" and we could not tell WHICH rule refused it. Fixing
+// the gas limit sends the transaction for real; ganache then reports the revert data.
+provider.estimateGas = async () => 5_000_000n;
 const signers = await Promise.all([0, 1, 2, 3, 4, 5, 6].map((i) => provider.getSigner(i)));
 const [resolver, radar, rainfall, pool, funder, stranger, beneficiary] = signers;
 
@@ -26,13 +30,42 @@ function check(name, ok) {
   else failed.push(name);
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}`);
 }
+// 4-byte selector (without 0x) of a custom error, looked up in the compiled ABIs.
+function errorSelector(errorName) {
+  for (const key of ["FloodTrigger", "PayoutEscrow"]) {
+    const fragment = new Interface(built[key].abi).getError(errorName);
+    if (fragment) return fragment.selector.slice(2).toLowerCase();
+  }
+  throw new Error(`unknown error ${errorName}`);
+}
 async function reverts(name, work, errorName) {
   try {
     await work();
     check(name, false);
   } catch (e) {
-    const text = [e.revert?.name, e.shortMessage, e.message, JSON.stringify(e.data ?? "")].join(" ");
-    check(name, text.includes(errorName));
+    const text = [e.revert?.name, e.shortMessage, e.message, JSON.stringify(e.data ?? ""), JSON.stringify(e.info ?? "")].join(" ");
+    // Match the error by name, or by its 4-byte selector in the returned revert data.
+    // The failed transaction was mined; ganache keeps its revert data in the trace.
+    let returned = "";
+    // Replay the refused transaction as a read-only call: state is unchanged by a revert,
+    // so the contract refuses again and the reason comes back in the error.
+    const sent = e.payload?.params?.[0] ?? e.info?.payload?.params?.[0];
+    if (sent) {
+      try {
+        returned = String(await chain.request({ method: "eth_call", params: [sent, "latest"] }));
+      } catch (callError) {
+        const data = callError?.data;
+        returned = String((typeof data === "string" ? data : data?.result) ?? "");
+        if (!returned && process.env.DEBUG_REVERTS) console.log("   call error:", JSON.stringify(callError).slice(0, 300));
+      }
+    } else if (process.env.DEBUG_REVERTS) {
+      console.log("   no payload; keys:", Object.keys(e).join(","));
+    }
+    returned = returned.replace(/^0x/, "");
+    const ok = text.includes(errorName) || returned.toLowerCase().startsWith(errorSelector(errorName));
+    if (!ok && process.env.DEBUG_REVERTS) console.log("   returned:", returned.slice(0, 80));
+    if (!ok && process.env.DEBUG_REVERTS) console.log("   got:", text.slice(0, 400));
+    check(name, ok);
   }
 }
 const warp = async (seconds) => {
@@ -116,9 +149,14 @@ check("release credits the committed beneficiary",
   (await escrow.withdrawable(await beneficiary.getAddress())) === parseEther("0.002"));
 check("a place that did not finalize is not paid", (await escrow.withdrawable(await stranger.getAddress())) === 0n);
 await reverts("a second release of the same claim reverts", () => escrow.release(id), "AlreadyPaid");
-const before = await provider.getBalance(await beneficiary.getAddress());
-await as(escrow, beneficiary).withdraw();
-check("the beneficiary can pull the payout", (await provider.getBalance(await beneficiary.getAddress())) > before);
+// Read balances straight from the chain (not through ethers' cache); gas is small next to 0.002.
+const balanceOf = async (signer) =>
+  BigInt(await chain.request({ method: "eth_getBalance", params: [await signer.getAddress(), "latest"] }));
+const before = await balanceOf(beneficiary);
+await (await as(escrow, beneficiary).withdraw()).wait();
+check("the beneficiary can pull the payout",
+  (await balanceOf(beneficiary)) - before > parseEther("0.0015") &&
+  (await escrow.withdrawable(await beneficiary.getAddress())) === 0n);
 await reverts("a wrong address has nothing to withdraw", () => as(escrow, stranger).withdraw(), "NothingToWithdraw");
 await reverts("the funder cannot reclaim mid-season", () => as(escrow, funder).reclaim(), "SeasonOpen");
 check("attester bonds are credited on finalization", (await trigger.withdrawable(await radar.getAddress())) >= bond);
