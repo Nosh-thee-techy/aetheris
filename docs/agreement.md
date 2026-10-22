@@ -1,6 +1,6 @@
 # Agreement table, 4–6 May 2024
 
-One scene. Seven places a report named as flooded. No `not_flooded` labels. The rule in `backtest/rule.toml` was not changed after these fractions were read.
+One scene. Seven places a report named as flooded. No `no_flood` labels. The rule in `config/rule.yaml` was not changed after these fractions were read. The metric log is `labels/label_log.csv`.
 
 The radar scene is the Sentinel-1A RTC on Planetary Computer, item `S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_rtc`, VV gamma0. Water is `10 * log10(VV) < -16` on pixels above zero. Permanent water is JRC Global Surface Water occurrence of at least 90 on tile `30E_0Nv1`, removed before the fraction. A zone is radar-yes when the flooded share of the remaining land pixels is at least 0.05. Rainfall is the same catchment decision on every row: 56.7 mm over the three days ending 6 May 2024, above the 40 mm prior, so rainfall is yes everywhere. The quorum is radar-yes and rainfall-yes. Here that means the quorum is the radar decision.
 
@@ -14,28 +14,34 @@ The radar scene is the Sentinel-1A RTC on Planetary Computer, item `S1A_IW_GRDH_
 | Kobura | 0.0095 | no, below threshold | yes | no |
 | Kadibo | no outline | abstain, no geometry | yes | no |
 
-`python backtest/score.py` on `backtest/labels.csv` and `backtest/observations.csv`:
+`python backtest/score.py` on `labels/label_log.csv` and `backtest/observations.csv`:
 
 | Count | Value |
 |---|---:|
-| True positives | 1 |
+| Labeled zone-weeks | 7 |
+| Flood labels | 7 |
+| Quorum hits | 1 |
 | False triggers | 0 |
 | Misses | 6 |
 | True negatives | 0 |
-| Precision | 1.000 |
-| Recall | 0.143 |
-| Basis risk | 0.857 |
-| Disagreement rate | 0.750 |
 
-Agreement buckets: `both_yes` 1, `rainfall_only` 3, `radar_abstain` 3. The other agreement buckets are 0.
+Agreement buckets: `both_yes` 1, `rainfall_only` 3, `radar_abstain` 3. The other agreement buckets are 0. Disagreements are 3 of 4 decided pairs.
 
 Miss buckets: `below_threshold` 3, `no_geometry` 3. `no_scene` is 0. The 6 May pass exists. The three abstentions are missing place outlines, not a missing satellite pass.
 
+| Rule | Hits | Misses | False triggers |
+|---|---:|---:|---:|
+| Radar only | 1 | 6 | 0 |
+| Radar plus rainfall | 1 | 6 | 0 |
+| Rainfall only | 7 | 0 | 0 |
+
+The same counts are in `backtest/results/counts.csv`.
+
 ## What these numbers can support
 
-Precision is 1.000 because the only quorum fire, Kabonyo Kanyagwal, is a flooded label. There is no dry label in the log, so this run does not test a false trigger. Recall is 1 of 7 named places. Basis risk is the other 6.
+These are counts from one week. They are indicative. There is no dry label, so the zero false triggers do not test a payout on a dry place. The quorum hits 1 of 7 flood labels. The other 6 are misses.
 
-Rainfall does not separate these places. All seven rows are rainfall-yes. The disagreement rate is 3 of 4 decided pairs: Ahero, Ombeyi, and Kobura are rainfall-yes and radar-no. The three geometry abstentions are outside that denominator.
+Rainfall is yes on every row, so radar-only and radar-plus-rainfall have the same counts. Rainfall does change three decided rows: Ahero, Ombeyi, and Kobura are rainfall-yes and radar-no, and the quorum does not fire there. Rainfall alone would have counted all seven flood labels as hits. The three geometry abstentions are outside the 4 decided pairs.
 
 ## How the boxes were measured
 

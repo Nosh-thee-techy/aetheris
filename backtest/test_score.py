@@ -1,11 +1,16 @@
 import unittest
 
+from pathlib import Path
+
 from backtest.score import (
     agreement_bucket,
+    format_report,
     index_labels,
     index_observations,
+    normalize_label_rows,
     quorum,
     score,
+    score_files,
 )
 
 
@@ -152,6 +157,46 @@ class ScoreTest(unittest.TestCase):
         self.assertEqual(result["counts"]["miss"], 1)
         self.assertEqual(result["misses"]["no_scene"], 1)
         self.assertEqual(result["agreement"]["radar_abstain"], 1)
+
+    def test_report_is_counts_not_a_percentage(self):
+        result = score(
+            labels(("a", "flood"), ("b", "no_flood")),
+            observations(
+                ("a", "radar", "yes", "threshold_met"),
+                ("a", "rainfall", "yes", "threshold_met"),
+                ("b", "radar", "no", "below_threshold"),
+                ("b", "rainfall", "yes", "threshold_met"),
+            ),
+        )
+        text = format_report(result)
+        self.assertNotIn("precision", text)
+        self.assertNotIn("%", text)
+        self.assertEqual(result["rules"]["radar_plus_rainfall"]["hits"], 1)
+        self.assertEqual(result["rules"]["radar_plus_rainfall"]["false_triggers"], 0)
+        self.assertEqual(result["rules"]["rainfall_only"]["false_triggers"], 1)
+        self.assertEqual(result["rules"]["radar_only"]["hits"], 1)
+
+    def test_label_log_uses_flood_and_leaves_unknown_unlabeled(self):
+        rows = normalize_label_rows(
+            [
+                {
+                    "zone": "ahero",
+                    "week": "2024-05-04/2024-05-06",
+                    "label": "flood",
+                    "source": "Daily Nation",
+                    "source_url": "https://example.test",
+                }
+            ]
+        )
+        indexed = index_labels(rows)
+        self.assertEqual(indexed[("ahero", "2024-05-04", "2024-05-06")], "flooded")
+        root = Path(__file__).resolve().parents[1]
+        logged = score_files(root / "labels" / "label_log.csv", root / "backtest" / "observations.csv")
+        self.assertEqual(logged["flood_labels"], 7)
+        self.assertEqual(logged["counts"]["false_trigger"], 0)
+        self.assertEqual(logged["counts"]["true_positive"], 1)
+        self.assertEqual(logged["misses"]["no_scene"], 0)
+        self.assertEqual(logged["misses"]["no_geometry"], 3)
 
 
 if __name__ == "__main__":
