@@ -1,6 +1,6 @@
 # Label log for 4–6 May 2024
 
-`backtest/labels.csv` has seven flooded places. There are no `not_flooded` rows. A place these reports do not name is absent, and the scorer treats that as unknown.
+`labels/label_log.csv` is the metric log: seven `flood` rows for the week `2024-05-04/2024-05-06`. There are no `no_flood` rows. A place these reports do not name is absent, and the scorer treats that as unknown. `backtest/labels.csv` keeps the same places with the scale notes.
 
 The event window is 4 May through 6 May 2024. The Nation reports that River Nyando burst its banks at 16:00 on Saturday 4 May. The report radar scene is the Sentinel-1A pass on 6 May.
 

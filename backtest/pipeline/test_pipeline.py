@@ -1,11 +1,11 @@
 import unittest
 from datetime import date
 
-from backtest.pipeline.ids import event_bounds, evidence_radar, evidence_rainfall, zone_id
+from backtest.pipeline.ids import event_bounds, event_week, evidence_radar, evidence_rainfall, trigger_id, zone_id
 from backtest.pipeline.keccak import keccak256
 from backtest.pipeline.radar import radar_action, select_scene
 from backtest.pipeline.rainfall import catchment_mm, published_total, rainfall_action, window_dates
-from backtest.pipeline.rule import load_rule, rule_hash
+from backtest.pipeline.rule import load_rule, rule_hash, rule_id, rule_id_text
 
 
 class KeccakTests(unittest.TestCase):
@@ -29,7 +29,14 @@ class RuleTests(unittest.TestCase):
         self.assertEqual(rule["rainfall"]["threshold_mm"], 40)
         self.assertEqual(rule["rainfall"]["lag_days"], 0)
         self.assertEqual(rule["rainfall"]["window_days"], 3)
+        self.assertEqual(rule["rainfall"]["product"], "chirps")
+        self.assertEqual(rule["radar"]["permanent_water_occurrence"], 90)
+        self.assertEqual(rule_id_text(), "nyando-open-water-v1")
         self.assertEqual(len(rule_hash()), 32)
+        self.assertEqual(len(rule_id()), 32)
+        self.assertEqual(rule["event_weeks"], ["2024-05-04/2024-05-06"])
+        self.assertIn("kabonyo-kanyagwal", rule["zones"])
+        self.assertNotIn("nyamasaria", rule["zones"])
 
 
 class IdTests(unittest.TestCase):
@@ -45,6 +52,13 @@ class IdTests(unittest.TestCase):
         start, end = event_bounds(date(2024, 5, 4), date(2024, 5, 6))
         self.assertLess(start, end)
         self.assertEqual(end - start, 3 * 24 * 60 * 60)
+
+    def test_trigger_id_binds_the_rule_file(self):
+        week = event_week("2024-05-04/2024-05-06")
+        first = trigger_id(zone_id("ahero"), week, rule_id(), rule_hash())
+        second = trigger_id(zone_id("ahero"), week, rule_id(), keccak256(b"other-file"))
+        self.assertEqual(len(first), 32)
+        self.assertNotEqual(first, second)
 
 
 class RainfallTests(unittest.TestCase):

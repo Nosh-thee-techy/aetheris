@@ -1,4 +1,4 @@
-"""Write four testnet role keys. The resolver deploys. It is not an attester.
+"""Write five testnet role keys. The resolver deploys. It is not an attester.
 
 Secrets go to .env at the repo root. That file is gitignored. Running this
 again leaves an existing file alone.
@@ -6,12 +6,13 @@ again leaves an existing file alone.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 
-from backtest.pipeline.rule import ROOT, rule_hash
+from backtest.pipeline.rule import ROOT, rule_hash, rule_id
 
 ENV_PATH = ROOT / ".env"
-ROLES = ("RESOLVER", "RADAR_ATTESTER", "RAINFALL_ATTESTER", "POOL")
+ROLES = ("RESOLVER", "RADAR_ATTESTER", "RAINFALL_ATTESTER", "POOL", "FUNDER")
 RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com"
 
 
@@ -33,10 +34,14 @@ def _accounts():
 
 def render(accounts) -> str:
     hashed = "0x" + rule_hash().hex()
-    resolver, radar, rainfall, pool = accounts
+    season_end = int(datetime(2026, 12, 31, tzinfo=timezone.utc).timestamp())
+    resolver, radar, rainfall, pool, funder = accounts
     lines = [
         f"SEPOLIA_RPC_URL={RPC_URL}",
-        f"RULE_HASH={hashed}",
+        f"RULE_ID=0x{rule_id().hex()}",
+        f"THRESHOLDS_HASH={hashed}",
+        "# Demo season end. Unspent escrow can be reclaimed only after this unix time.",
+        f"SEASON_END={season_end}",
         "# The resolver deploys. The contract rejects a resolver who is also an attester.",
         f"DEPLOYER_PRIVATE_KEY=0x{resolver.key.hex()}",
         f"RESOLVER={resolver.address}",
@@ -46,6 +51,8 @@ def render(accounts) -> str:
         f"RAINFALL_ATTESTER_PRIVATE_KEY=0x{rainfall.key.hex()}",
         f"POOL={pool.address}",
         f"POOL_PRIVATE_KEY=0x{pool.key.hex()}",
+        f"FUNDER={funder.address}",
+        f"FUNDER_PRIVATE_KEY=0x{funder.key.hex()}",
         "",
     ]
     return "\n".join(lines)
@@ -64,7 +71,7 @@ def addresses(path: Path = ENV_PATH) -> dict[str, str]:
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        if key in ("RESOLVER", "RADAR_ATTESTER", "RAINFALL_ATTESTER", "POOL", "RULE_HASH"):
+        if key in ("RESOLVER", "RADAR_ATTESTER", "RAINFALL_ATTESTER", "POOL", "FUNDER", "RULE_ID", "THRESHOLDS_HASH"):
             found[key] = value
     return found
 

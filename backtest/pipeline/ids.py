@@ -32,6 +32,24 @@ def evidence_rainfall(first: date, last: date) -> bytes:
     return keccak256(f"{CHIRPS}:{first.isoformat()}:{last.isoformat()}".encode())
 
 
+def event_week(week: str) -> bytes:
+    """bytes32 week id. The label log writes the week as start/end."""
+    if "/" not in week:
+        raise ValueError("week must be start/end")
+    return keccak256(week.encode())
+
+
+def trigger_id(zone: bytes, week: bytes, rule: bytes, thresholds: bytes) -> bytes:
+    """keccak256(abi.encode(zoneId, eventWeek, ruleId, thresholdsHash)).
+
+    abi.encode of four bytes32 values is their concatenation.
+    """
+    parts = (zone, week, rule, thresholds)
+    if any(len(part) != 32 for part in parts):
+        raise ValueError("trigger id parts are bytes32")
+    return keccak256(b"".join(parts))
+
+
 def event_bounds(start: date, end: date) -> tuple[int, int]:
     """Inclusive calendar dates as a unix window that covers the end date."""
     if end < start:

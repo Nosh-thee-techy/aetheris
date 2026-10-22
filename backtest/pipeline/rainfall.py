@@ -1,8 +1,12 @@
 """CHIRPS catchment decision for the frozen rainfall rule.
 
+IMERG is not connected. The checked product is CHIRPS 2.0, already used for
+the lag check. Satellite rainfall products overestimate light rain and
+underestimate heavy rain, so a millimetre total here is not a gauge total.
+
 The scored 6 May 2024 total stays the published check. A later scene reads
-UCSB-CHG/CHIRPS/DAILY on Earth Engine and averages the two headwater boxes
-there. This module does not download a CHIRPS GeoTIFF.
+UCSB-CHG/CHIRPS/DAILY on Earth Engine and averages the two headwater boxes.
+The lag is the rule file's lag_days. This module does not download a CHIRPS GeoTIFF.
 """
 
 from __future__ import annotations
