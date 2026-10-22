@@ -1,0 +1,19 @@
+{
+  "name": "aetheris-contract-tools",
+  "private": true,
+  "type": "module",
+  "description": "Compile, rehearse on a local chain, and deploy Aetheris to a public testnet. Used because Foundry is not required for these steps.",
+  "scripts": {
+    "compile": "node compile.mjs",
+    "rehearse": "node rehearse.mjs",
+    "check": "node deploy_testnet.mjs --check",
+    "deploy": "node deploy_testnet.mjs"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0",
+    "solc": "0.8.24"
+  },
+  "devDependencies": {
+    "ganache": "^7.9.2"
+  }
+}

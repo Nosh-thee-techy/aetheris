@@ -4,6 +4,7 @@ out/
 cache/
 broadcast/
 node_modules/
+contracts/tools/build/
 __pycache__/
 *.pyc
 .venv/
