@@ -1,16 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import {IFloodResolver} from "./IFloodResolver.sol";
+
 /// A flood trigger finalizes only when the radar attester and at least one
-/// corroborator have signed the frozen rule, and a challenge either never
-/// arrives or expires without the resolver rejecting it.
+/// corroborator have signed, and a challenge either never arrives or expires
+/// without the resolver rejecting it.
 ///
-/// The trigger id is keccak256(zone, window, ruleHash). Signing it means
-/// "this rule fired." Silence is a no. The resolver cannot open a trigger,
-/// add a signature, or change an evidence hash.
+/// triggerId = keccak256(zoneId, eventWeek, ruleId, thresholdsHash).
+/// Signing it means "this payout rule fired", not "I observed something".
+/// Silence is a no. Each attester stores its own evidence hash. There is no
+/// second boolean on the same id.
+///
+/// The demo resolver is one named key, not a vote. IFloodResolver is the
+/// single function a later vote would call. The resolver cannot open a
+/// trigger, add a signature, or change an evidence hash.
 ///
 /// Unaudited. Testnet only.
-contract FloodTrigger {
+contract FloodTrigger is IFloodResolver {
     uint256 public constant CHALLENGE_WINDOW = 24 hours;
     uint256 public constant RESOLVE_WINDOW = 48 hours;
     uint256 public constant CHALLENGE_STAKE = 0.01 ether;
@@ -21,7 +28,8 @@ contract FloodTrigger {
     uint8 public constant REASON_UPHELD = 2;
     uint8 public constant REASON_EXPIRY = 3;
 
-    bytes32 public immutable ruleHash;
+    bytes32 public immutable ruleId;
+    bytes32 public immutable thresholdsHash;
     address public immutable resolver;
     address public immutable radarAttester;
     address public immutable pool;
@@ -32,8 +40,7 @@ contract FloodTrigger {
 
     struct Trigger {
         bytes32 zoneId;
-        uint64 eventStart;
-        uint64 eventEnd;
+        bytes32 eventWeek;
         uint64 windowStart;
         uint64 resolveDeadline;
         State state;
@@ -81,8 +88,10 @@ contract FloodTrigger {
     error NothingToWithdraw();
     error TransferFailed();
 
+    /// Binds the frozen rule. Reverts if the resolver is also an attester.
     constructor(
-        bytes32 _ruleHash,
+        bytes32 _ruleId,
+        bytes32 _thresholdsHash,
         address _resolver,
         address _radarAttester,
         address[] memory corroborators,
@@ -91,7 +100,7 @@ contract FloodTrigger {
         if (_resolver == address(0) || _radarAttester == address(0) || _pool == address(0)) {
             revert ZeroAddress();
         }
-        if (_ruleHash == bytes32(0)) revert EmptyRule();
+        if (_ruleId == bytes32(0) || _thresholdsHash == bytes32(0)) revert EmptyRule();
         if (corroborators.length == 0) revert NoCorroborator();
 
         for (uint256 i = 0; i < corroborators.length; i++) {
@@ -103,39 +112,51 @@ contract FloodTrigger {
             isCorroborator[corroborator] = true;
         }
 
-        ruleHash = _ruleHash;
+        ruleId = _ruleId;
+        thresholdsHash = _thresholdsHash;
         resolver = _resolver;
         radarAttester = _radarAttester;
         pool = _pool;
     }
 
-    function computeId(bytes32 zoneId, uint64 eventStart, uint64 eventEnd) public view returns (bytes32) {
-        return keccak256(abi.encode(zoneId, eventStart, eventEnd, ruleHash));
+    /// The id a signature commits to. Same bytes the escrow uses as a fingerprint.
+    function computeId(bytes32 zoneId, bytes32 eventWeek) public view returns (bytes32) {
+        return keccak256(abi.encode(zoneId, eventWeek, ruleId, thresholdsHash));
     }
 
+    /// Full trigger record. Empty id returns the zero struct.
     function getTrigger(bytes32 id) external view returns (Trigger memory) {
         return _triggers[id];
     }
 
+    /// The parts the escrow needs, without taking a dependency on Trigger layout.
+    function claimParts(bytes32 id) external view returns (bytes32 zoneId, bytes32 eventWeek, uint8 state) {
+        Trigger storage t = _triggers[id];
+        return (t.zoneId, t.eventWeek, uint8(t.state));
+    }
+
+    /// Addresses that posted a bond on this id, in the order they signed.
     function signersOf(bytes32 id) external view returns (address[] memory) {
         return _signers[id];
     }
 
+    /// True only after radar and at least one corroborator have signed.
     function quorumReached(bytes32 id) public view returns (bool) {
         Trigger storage t = _triggers[id];
         return t.radarSigned && t.corroboratorCount >= 1;
     }
 
-    /// An attester commits evidence that the frozen rule fired for this zone and window.
-    function attest(bytes32 zoneId, uint64 eventStart, uint64 eventEnd, bytes32 evidenceHash) external payable {
+    /// An attester posts a bond and evidence that this frozen rule fired.
+    /// A second signature from the same attester reverts, whatever the evidence.
+    function attest(bytes32 zoneId, bytes32 eventWeek, bytes32 evidenceHash) external payable {
         if (msg.value != ATTESTER_BOND) revert BondRequired();
         if (evidenceHash == bytes32(0)) revert EmptyEvidence();
-        if (eventEnd <= eventStart) revert BadWindow();
+        if (eventWeek == bytes32(0)) revert BadWindow();
 
         bool radar = msg.sender == radarAttester;
         if (!radar && !isCorroborator[msg.sender]) revert NotAttester();
 
-        bytes32 id = computeId(zoneId, eventStart, eventEnd);
+        bytes32 id = computeId(zoneId, eventWeek);
         Trigger storage t = _triggers[id];
         if (t.state != State.None && t.state != State.Proposed) revert Closed();
         if (hasSigned[id][msg.sender]) revert AlreadySigned();
@@ -143,8 +164,7 @@ contract FloodTrigger {
         if (t.state == State.None) {
             t.state = State.Proposed;
             t.zoneId = zoneId;
-            t.eventStart = eventStart;
-            t.eventEnd = eventEnd;
+            t.eventWeek = eventWeek;
         }
 
         hasSigned[id][msg.sender] = true;
@@ -223,6 +243,7 @@ contract FloodTrigger {
         _refundBonds(id);
     }
 
+    /// Pull a refunded bond, a returned stake, or a slashed bond.
     function withdraw() external {
         uint256 amount = withdrawable[msg.sender];
         if (amount == 0) revert NothingToWithdraw();
@@ -231,6 +252,7 @@ contract FloodTrigger {
         if (!ok) revert TransferFailed();
     }
 
+    /// Move a trigger to Finalized and record why. Does not move ether.
     function _finalize(bytes32 id, uint8 reason) internal {
         Trigger storage t = _triggers[id];
         t.state = State.Finalized;
@@ -238,6 +260,7 @@ contract FloodTrigger {
         emit Finalized(id, reason);
     }
 
+    /// Return every attester bond for this id through the pull balance.
     function _refundBonds(bytes32 id) internal {
         address[] storage signers = _signers[id];
         for (uint256 i = 0; i < signers.length; i++) {
@@ -249,6 +272,7 @@ contract FloodTrigger {
         }
     }
 
+    /// Drop bond balances without paying them. Used when the challenger is paid.
     function _clearBonds(bytes32 id) internal {
         address[] storage signers = _signers[id];
         for (uint256 i = 0; i < signers.length; i++) {
@@ -256,6 +280,7 @@ contract FloodTrigger {
         }
     }
 
+    /// Sum of bonds still recorded on this id.
     function _bondTotal(bytes32 id) internal view returns (uint256 total) {
         address[] storage signers = _signers[id];
         for (uint256 i = 0; i < signers.length; i++) {
@@ -263,6 +288,7 @@ contract FloodTrigger {
         }
     }
 
+    /// Add to a pull-payment balance. Zero is a no-op.
     function _credit(address to, uint256 amount) internal {
         if (amount == 0) return;
         withdrawable[to] += amount;
