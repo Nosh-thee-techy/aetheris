@@ -1,0 +1,49 @@
+{
+  "network": "Sepolia",
+  "chain_id": 11155111,
+  "explorer": "https://sepolia.etherscan.io",
+  "block": 11974896,
+  "snapshot_at": "2026-10-23T06:31:51.637Z",
+  "trigger": {
+    "address": "0xFE35E6F742e7bdD2864AB753035F82047399E3D2",
+    "tx": "0x36a880f247dd147408047d0ba93bc4ececd664a30d13751197dcead28dbf2129"
+  },
+  "escrow": {
+    "address": "0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1",
+    "tx": "0x57c8755b180c5e29abba713a676b2838df61c9b042857f4d54d260b0468da41f"
+  },
+  "roles": {
+    "resolver": "0x7879c568aaA7EB06D8c4Eb54EBd0dd45CC3E9d54",
+    "radar": "0x2C9D987c43c21D444abE3760445B755A1Ac5224a",
+    "rainfall": "0xDaeC50e751f97FCf85F61d724ed522887C94b7a4",
+    "pool": "0x03Ac8ee3FceE2865d5A0B9122BeF60b4C720612A",
+    "funder": "0x657c2A0A1ffFF9ce544bb7e0B03714ADE1D8bC54"
+  },
+  "rule_id": "0x4bd2fdf5a616bf18729fa6372829087a39d37a0ee5497b71f1a340a571dfae50",
+  "thresholds_hash": "0x1c6711d40c3742d19b3da4368c97a56e8777cf19c845e2ec5b2608831f232d4b",
+  "policy_hash": "0xa01c81a000691153de7b4d4b38293844eb418300fac9f49025eab15ae76212e8",
+  "season_end": 1798675200,
+  "pool_balance_eth": "0.02",
+  "beneficiaries": "placeholder addresses derived from a hash; nobody holds a key for them",
+  "claims": [
+    {
+      "zone": "kabonyo-kanyagwal",
+      "zone_name": "Kabonyo Kanyagwal",
+      "trigger_id": "0x97b3fdcca00b1583d76d1c2a7f7679843893b6c88bc7951631223067e9196ff0",
+      "state": "Proposed: challenge window open",
+      "finalizes_at": 1792823508,
+      "signers": [
+        {
+          "role": "Radar",
+          "address": "0x2C9D987c43c21D444abE3760445B755A1Ac5224a",
+          "evidence": "0x6d9d25bb16d7414b9230df3ed295b98e44248299f9f1159890e5f293fd0a2171"
+        },
+        {
+          "role": "Rainfall",
+          "address": "0xDaeC50e751f97FCf85F61d724ed522887C94b7a4",
+          "evidence": "0x85273d2dd6807a1417e01928e1f3c2162b233c1854e09552c065e4600cb2cdf1"
+        }
+      ]
+    }
+  ]
+}

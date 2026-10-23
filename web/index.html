@@ -252,26 +252,34 @@
   <p>A contract holds a payout pool and releases it only for a finalized claim, to beneficiaries committed in advance, at most once per claim.</p></div>
   <div class="chain">
   <div class="panel">
-    <span class="status wait">Not deployed yet</span>
-    <h3>Testnet deployment</h3>
-    <p>The contracts are written and their tests run in CI, but nothing from this project is on a public
-    testnet yet. Deploying needs a little test ETH in the project’s own test wallets, which has to come from a
-    faucet. Until that happens this page shows no on-chain state, because inventing some would be the opposite
-    of what it is for.</p>
-    <p class="note">When deployed, this section lists each contract, each signer, each signature’s evidence
-    hash, a live challenge countdown, and the escrow’s pool.</p>
-  </div>
-  <div class="panel">
-    <h3>What is fixed when it is deployed</h3>
+    <span class="status live">Deployed on Sepolia</span>
+    <h3>Contracts</h3>
     <dl>
+      <dt>FloodTrigger</dt><dd><a href="https://sepolia.etherscan.io/address/0xFE35E6F742e7bdD2864AB753035F82047399E3D2"><code>0xFE35E6…99E3D2</code></a></dd>
+      <dt>PayoutEscrow</dt><dd><a href="https://sepolia.etherscan.io/address/0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1"><code>0x70A0c3…98A7d1</code></a></dd>
+      <dt>Block</dt><dd>11974896</dd>
+      <dt>Policy hash</dt><dd><code>0xa01c81a000691153de7b4d4b38293844eb418300fac9f49025eab15ae76212e8</code></dd>
+      <dt>Escrow pool</dt><dd>0.02 test ETH</dd>
+      <dt>Snapshot</dt><dd>2026-10-23T06:31:51.637Z</dd>
+    </dl>
+  </div>
+  <div class="panel"><h3>Roles</h3><dl><dt>Radar attester</dt><dd><a href="https://sepolia.etherscan.io/address/0x2C9D987c43c21D444abE3760445B755A1Ac5224a"><code>0x2C9D98…c5224a</code></a></dd><dt>Rainfall attester</dt><dd><a href="https://sepolia.etherscan.io/address/0xDaeC50e751f97FCf85F61d724ed522887C94b7a4"><code>0xDaeC50…94b7a4</code></a></dd><dt>Referee (one key in this demo)</dt><dd><a href="https://sepolia.etherscan.io/address/0x7879c568aaA7EB06D8c4Eb54EBd0dd45CC3E9d54"><code>0x7879c5…3E9d54</code></a></dd><dt>Funder</dt><dd><a href="https://sepolia.etherscan.io/address/0x657c2A0A1ffFF9ce544bb7e0B03714ADE1D8bC54"><code>0x657c2A…D8bC54</code></a></dd><dt>Slash pool</dt><dd><a href="https://sepolia.etherscan.io/address/0x03Ac8ee3FceE2865d5A0B9122BeF60b4C720612A"><code>0x03Ac8e…20612A</code></a></dd></dl></div>
+  <div class="panel">
+    <span class="status live">Proposed: challenge window open</span>
+    <h3>Claim: Kabonyo Kanyagwal, 4–6 May 2024</h3>
+    <div class="countdown" data-finalizes="1792823508">24 Oct 2026 06:31 UTC</div>
+    <p class="note">Anyone can stake a challenge until then. After it, anyone can finalize and the escrow can release once.</p>
+    <ul class="tl"><li class='done'><b>Radar</b> signed · evidence <code>0x6d9d25bb16d7…</code></li><li class='done'><b>Rainfall</b> signed · evidence <code>0x85273d2dd680…</code></li><li>Challenge window closes 24 Oct 2026 06:31 UTC</li><li>Finalize, then the escrow can release once</li></ul>
+    <dl><dt>Claim id</dt><dd><code>0x97b3fdcca00b1583d76d1c2a7f7679843893b6c88bc7951631223067e9196ff0</code></dd></dl>
+  </div>
+  <div class="panel"><h3>Fixed at deploy</h3><dl>
       <dt>Attester bond</dt><dd>0.01 ETH, returned when a claim finalizes</dd>
       <dt>Challenge stake</dt><dd>0.01 ETH</dd>
       <dt>Challenge window</dt><dd>24 hours after both signatures</dd>
       <dt>Referee window</dt><dd>48 hours, then the attesters’ claim stands</dd>
       <dt>Rule id</dt><dd>nyando-open-water-v1<br><code>0x4bd2fdf5a616bf18729fa6372829087a39d37a0ee5497b71f1a340a571dfae50</code></dd>
       <dt>Thresholds hash</dt><dd><code>0x1c6711d40c3742d19b3da4368c97a56e8777cf19c845e2ec5b2608831f232d4b</code></dd>
-    </dl>
-  </div>
+    </dl></div>
 </div>
 </div></section>
 
@@ -313,7 +321,7 @@
     <li>JRC Global Surface Water</li>
     <li>Place boundaries © OpenStreetMap contributors</li>
   </ul></div>
-  <div><h3>This page</h3><p>Generated 22 Oct 2026 from the repository’s own files by <code>web/build.py</code>. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+  <div><h3>This page</h3><p>Generated 23 Oct 2026 from the repository’s own files by <code>web/build.py</code>. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
 <script>
