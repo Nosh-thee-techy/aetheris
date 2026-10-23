@@ -78,7 +78,27 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 
 **In the same contract, drop these first if the backtest slips:** attester bonds, the uphold-or-reject resolver, and challenge expiry. Those three are already in `FloodTrigger`. `PayoutEscrow` pays a committed beneficiary after `Finalized`.
 
-**Later:** testnet deploy with the keys from `python -m backtest.pipeline.keys`. The radar and rainfall jobs are in `backtest/pipeline`. `web/index.html` shows this week's counts. It is not a live chain view.
+**Done:** both contracts are deployed on Sepolia (see below), with one claim open: Kabonyo Kanyagwal. The radar and rainfall jobs in `backtest/pipeline` decide whether to sign. They do not send transactions yet; the deploy script submitted the demo claim with the same two keys. The site in `web/` reads the contracts live in the browser.
+
+## Deployed on Sepolia
+
+Testnet only. Unaudited. Record: `web/data/deployment.json`.
+
+| | |
+|---|---|
+| FloodTrigger | [`0xFE35E6F742e7bdD2864AB753035F82047399E3D2`](https://sepolia.etherscan.io/address/0xFE35E6F742e7bdD2864AB753035F82047399E3D2) |
+| PayoutEscrow | [`0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1`](https://sepolia.etherscan.io/address/0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1) |
+
+- The claim for Kabonyo Kanyagwal, 4–6 May 2024, has both required signatures. Its 24-hour challenge window closes 2026-10-24 06:31 UTC. Anyone can challenge until then, then anyone can finalize, then anyone can release.
+- The six other places have no claim. The rule did not fire there, and the contract holds nothing for them.
+- The seven payout beneficiaries are placeholder addresses derived from a hash. Nobody holds a key for them. A release credits them correctly and the ETH stays there.
+- `thresholdsHash` on the chain equals keccak256 of `config/rule.yaml` **as stored in git**. `.gitattributes` pins that file's bytes, line endings included. Check it yourself on the Backtest page, or:
+
+```powershell
+node -e "const {keccak256}=require('./contracts/tools/node_modules/ethers');console.log(keccak256(require('fs').readFileSync('config/rule.yaml')))"
+```
+
+Expected: `0x1c6711d40c3742d19b3da4368c97a56e8777cf19c845e2ec5b2608831f232d4b`.
 
 **Not in this build:** USSD, a simulated ground attester, and a resolver multisig. Ground readings are not labels.
 
@@ -88,9 +108,11 @@ Hold out a whole other season if you tune anything. Neighboring zones share the 
 config/rule.yaml   frozen rule, hashed as thresholdsHash
 labels/label_log.csv  flood / no_flood / unknown
 contracts/         FloodTrigger, PayoutEscrow, Foundry tests, deploy script
+contracts/tools/   node scripts: compile, rehearse (local chain), deploy_testnet, referee
 backtest/          scorer, results/counts.csv, scene and rainfall checks
 watcher/           Daraja SANDBOX mirror, no KES moved
-web/index.html     static view of this week's counts
+web/               the site: build.py generates the pages, app.js reads the chain
+web/data/          deployment record and copies of the data the pages cite
 docs/agreement.md  scored agreement table
 .github/           tests on push
 ```
@@ -114,11 +136,35 @@ forge test --root contracts
 Backtest tests use the Python standard library:
 
 ```powershell
-python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror
-python backtest/score.py
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror web.test_build
+python -m backtest.score
 ```
 
-`python backtest/score.py` reads `labels/label_log.csv` and writes `backtest/results/counts.csv`. The notebook `backtest/agreement.ipynb` runs the same scorer.
+`python -m backtest.score` reads `labels/label_log.csv` and writes `backtest/results/counts.csv`. The notebook `backtest/agreement.ipynb` runs the same scorer.
+
+### The site
+
+```powershell
+python web/build.py        # writes the pages, chain-config.js and web/data/
+start web/index.html       # opens from disk; no server needed
+```
+
+Pages: Overview, Claims, one page per place, Backtest, Payouts. `build.py` computes the claim ids and evidence hashes and **fails the build** if they disagree with `web/data/deployment.json`. `app.js` reads Sepolia in the browser and holds no keys. Writes (challenge, finalize, release, withdraw) go through the visitor's own wallet. The only library is a vendored copy of ethers 6.17.0 in `web/vendor/`. Nothing loads from a CDN.
+
+### The contract tools
+
+These were run on Node 24. `forge test` remains the contract test suite. The rehearsal is a second, independent check on a local in-process chain.
+
+```powershell
+cd contracts/tools
+npm install
+node rehearse.mjs                       # 26 checks on a local chain; no network, no funds
+node deploy_testnet.mjs --check         # balances and readiness; sends nothing
+node referee.mjs status kabonyo-kanyagwal
+node referee.mjs finalize kabonyo-kanyagwal   # after the window; also: release, expire, uphold, reject
+```
+
+`uphold` and `reject` work only with the referee key. That key is the deployer key in `.env`. Never paste it into a browser wallet.
 
 Deploy reads `RULE_ID`, `THRESHOLDS_HASH`, `RESOLVER`, `RADAR_ATTESTER`, `RAINFALL_ATTESTER`, `POOL`, `FUNDER`, and `SEASON_END` from the environment. `python -m backtest.pipeline.keys` writes those to `.env` and will not overwrite a file that is already there. The resolver key deploys. It is not an attester. `THRESHOLDS_HASH` is keccak256 of `config/rule.yaml`. Copy `.env` into the shell, fund `RESOLVER` on Sepolia, then:
 
