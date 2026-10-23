@@ -1,0 +1,5 @@
+# thresholdsHash is keccak256 of these files' exact bytes, and that hash is
+# fixed in a deployed contract. Git must never rewrite their line endings,
+# or a clone on another machine would hash to a different value.
+config/rule.yaml -text
+web/data/rule.yaml -text
