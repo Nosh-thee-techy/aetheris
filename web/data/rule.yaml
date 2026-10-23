@@ -1,0 +1,58 @@
+# Frozen on 2026-10-12, before the 4-6 May 2024 score.
+# These numbers are untuned priors. The reported week was not used to fit them.
+# April 2020 was used only to check that daily headwater rain moves with the
+# plain on the same day. There is no second labeled season to tune on.
+# Neighboring Nyando zones share one flood, so they are not a held-out split.
+# thresholdsHash is keccak256 of this file's bytes. Do not reformat it.
+
+status: frozen
+frozen_on: 2026-10-12
+rule_id: nyando-open-water-v1
+
+region:
+  name: Nyando basin, western Kenya
+  hazard: flood
+  season: 2024 long rains
+  report_scene_date: 2024-05-06
+  report_granule: S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_D2D7
+
+event_weeks:
+  - 2024-05-04/2024-05-06
+
+zones:
+  - ahero
+  - kabonyo-kanyagwal
+  - kakola-ombaka
+  - nyamasao
+  - ombeyi
+  - kobura
+  - kadibo
+
+quorum:
+  radar_required: true
+  corroborators_required: 1
+
+radar:
+  threshold_db: -16.0
+  min_flooded_fraction: 0.05
+  permanent_water_occurrence: 90
+  permanent_water_masked: true
+  detects: open_water_only
+
+rainfall:
+  product: chirps
+  spatial: upstream_catchment
+  catchment_id: nyando-headwaters-box-v1
+  lag_days: 0
+  window_days: 3
+  threshold_mm: 40
+  nandi_tinderet:
+    west: 35.05
+    south: 0.00
+    east: 35.40
+    north: 0.25
+  kericho_mau:
+    west: 35.15
+    south: -0.45
+    east: 35.50
+    north: -0.15

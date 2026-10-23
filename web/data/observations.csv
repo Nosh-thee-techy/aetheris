@@ -1,0 +1,15 @@
+zone_id,event_start,event_end,source,decision,reason
+ahero,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+kabonyo-kanyagwal,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+kakola-ombaka,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+nyamasao,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+ombeyi,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+kobura,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+kadibo,2024-05-04,2024-05-06,rainfall,yes,threshold_met
+ahero,2024-05-04,2024-05-06,radar,no,below_threshold
+kabonyo-kanyagwal,2024-05-04,2024-05-06,radar,yes,threshold_met
+kakola-ombaka,2024-05-04,2024-05-06,radar,abstain,no_geometry
+nyamasao,2024-05-04,2024-05-06,radar,abstain,no_geometry
+ombeyi,2024-05-04,2024-05-06,radar,no,below_threshold
+kobura,2024-05-04,2024-05-06,radar,no,below_threshold
+kadibo,2024-05-04,2024-05-06,radar,abstain,no_geometry

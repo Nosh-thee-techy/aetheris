@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backtest · Aetheris</title>
+<meta name="description" content="Agreement, disagreement and misses between satellite rainfall and Sentinel-1 radar for the Nyando basin flood week, as counts, with downloads and a way to reproduce them.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="backtest">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html" aria-current="page">Backtest</a><a href="payouts.html">Payouts</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <p class="eyebrow">Backtest · one season · counts only</p>
+  <h1>Where the sources agreed, disagreed, and what was missed</h1>
+  <p class="lede">One flood week, 7 places, one frozen rule. We report counts, not an accuracy percentage, because seven news reports cannot carry one. The rule was fixed on 2026-10-12, before this week was scored, and we did not tune it afterwards.</p>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>Agreement</h2>
+  <p>The rows where the sources disagree are the only rows where the second source changes the result.</p></div>
+  <div class="matrix-wrap">
+    <div><table class="matrix">
+  <caption>Radar (rows) against rainfall (columns), 7 places reported flooded</caption>
+  <thead><tr><th></th><th scope="col">Rainfall signed</th><th scope="col">Rainfall did not sign</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Radar signed</th><td><span class="big">1</span><small>Kabonyo Kanyagwal</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar did not sign</th><td class="hl"><span class="big">3</span><small>Kobura, Ahero, Ombeyi</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar not assessed</th><td><span class="big">3</span><small>Kakola Ombaka, Nyamasao, Kadibo</small></td><td class="zero n">0</td></tr>
+  </tbody>
+</table></div>
+    <div><table>
+  <caption>Three rules on the same seven places</caption>
+  <thead><tr><th></th><th class="n">Found</th><th class="n">Missed</th><th class="n">False triggers</th></tr></thead>
+  <tbody><tr><th scope="row">Radar only</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Radar and rainfall (the rule)</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Rainfall only</th><td class="n">7</td><td class="n">0</td><td class="n">0</td></tr></tbody>
+</table></div>
+  </div>
+  <div class="takeaway">
+    <p><b>Rainfall was “yes” in every place, so it told us almost nothing about which places flooded.</b> It disagreed with radar in 3 of the 4 places radar could judge.</p>
+    <p>Requiring radar means 6 of 7 reported floods produced no claim: 3 where radar saw too little open water, and 3 where it could not look. Rainfall alone would have found all 7, but there is no “did not flood” place in this log, so we cannot say how often rainfall alone would raise a false alarm. Neither number is an accuracy figure. They are counts from one week.</p>
+    <p>Misses caused by radar having no pass that week: <b>0</b>. The 6 May scene existed.</p>
+  </div>
+  <div class="matrix-wrap gap-l"><div><table>
+  <caption>Why the reported floods that produced no claim were missed</caption>
+  <thead><tr><th></th><th class="n">Places</th></tr></thead>
+  <tbody><tr><th scope="row">Radar had no pass that week</th><td class="n">0</td></tr><tr><th scope="row">Radar saw too little open water</th><td class="n">0</td></tr><tr><th scope="row">Radar signed, the second source did not</th><td class="n">0</td></tr><tr><th scope="row">Rainfall data was missing</th><td class="n">0</td></tr><tr><th scope="row">No outline to measure, radar not run</th><td class="n">0</td></tr></tbody>
+</table></div><div></div></div>
+</div></section>
+
+<section class="block alt" id="check"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Check that the rule on the chain is the rule in the repository</h2>
+  <p>Each claim id contains a hash of <code>config/rule.yaml</code>. This button hashes the file here, in your browser, then asks the contract what hash it holds. If someone had changed the rule after the fact, they would not match.</p></div>
+  <button class="btn primary" type="button" data-check-rule disabled>Hash the rule and compare</button>
+  <div data-check-out class="check-out" aria-live="polite"></div>
+  <p class="note">The file is stored byte for byte, line endings included, because the hash covers every byte. See <a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/.gitattributes"><code>.gitattributes</code></a>.</p>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Download the data</h2>
+  <p>These are copies of the repository files the numbers are computed from.</p></div>
+  <ul class="downloads"><li><a href="data/counts.csv" download>counts.csv</a><span>Every count on this page · <code>backtest/results/counts.csv</code></span></li><li><a href="data/label_log.csv" download>label_log.csv</a><span>The seven places and the reports that named them · <code>labels/label_log.csv</code></span></li><li><a href="data/radar_fractions.csv" download>radar_fractions.csv</a><span>Radar fraction and pixel counts per place · <code>backtest/checks/radar_fractions.csv</code></span></li><li><a href="data/observations.csv" download>observations.csv</a><span>What each source signed, per place · <code>backtest/observations.csv</code></span></li><li><a href="data/rule.yaml" download>rule.yaml</a><span>The frozen rule, byte for byte (its hash is on the testnet) · <code>config/rule.yaml</code></span></li></ul>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>Reproduce it</h2>
+  <p>From a clone of <a href="https://github.com/Nosh-thee-techy/aetheris">the repository</a>, with Python 3:</p></div>
+<pre class="cmd"><code>python -m backtest.score          # reads labels/label_log.csv and backtest/observations.csv
+                                  # writes backtest/results/counts.csv
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror
+python web/build.py               # rebuilds these pages from the same files</code></pre>
+  <p class="note">The radar fractions come from <code>backtest/checks/radar_fraction.py</code>, which needs network access to Microsoft Planetary Computer. The scored result does not depend on rerunning it: the measured values are in the CSV above.</p>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">05</span><h2>What this cannot tell you</h2></div>
+  <ul class="limits">
+    <li><b>No “did not flood” labels.</b><span>Without them there are no false alarms to count, so no precision, and we publish none.</span></li>
+    <li><b>Seven reports favour reachable places.</b><span>Places that reporters and rescuers could reach are over-represented. Unknown is not “no flood”.</span></li>
+    <li><b>Boxes are not flood outlines.</b><span>A ward box mixes dry and wet land, which pulls the radar fraction down. That is one reason radar says no in 3 places.</span></li>
+    <li><b>One week.</b><span>Nothing here says how the rule behaves in another season. It is a frozen first rule, to be judged on a season it has not seen.</span></li>
+  </ul>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 23 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

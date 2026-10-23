@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claims · Aetheris</title>
+<meta name="description" content="The seven places reported flooded in the Nyando basin, 4–6 May 2024, with what radar and rainfall each said and the live state of each claim on Sepolia.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="claims">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html" aria-current="page">Claims</a><a href="backtest.html">Backtest</a><a href="payouts.html">Payouts</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <p class="eyebrow">Claims · Nyando basin · 4–6 May 2024</p>
+  <h1>Seven places, one flood week</h1>
+  <p class="lede">News reports named these seven places as flooded. For each one, the rule asks radar and rainfall whether they sign. Where both do, a claim opens on the testnet and anyone can challenge it. Pick a place to see the evidence and the actions open to you.</p>
+  <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
+  <p class="tally" data-live-tally></p>
+</div></section>
+
+<section class="block tight"><div class="wrap">
+  <div class="catch">
+    <div><b>Rainfall, for every place at once.</b> It is read on the upstream headwaters, not on each place, so it gives one answer for the whole week.</div>
+    <div class="row">
+      <div><div class="gauge" role="img" aria-label="56.7 millimetres against a line at 40 millimetres"><i class="rain" style="width:70.9%"></i><b style="left:50.0%"></b></div>
+      <div class="gauge-scale"><span>0 mm</span><span>line 40 mm</span><span>80 mm</span></div></div>
+      <div><b>56.7 mm</b> in the three days to 6 May (CHIRPS satellite estimate). Signed for all 7 places.</div>
+    </div>
+  </div>
+  <ul class="legend" aria-label="Key">
+    <li><span class="dot signed"></span>Signed</li><li><span class="dot half"></span>In progress</li><li><span class="dot no"></span>Did not sign, or no claim</li><li><span class="dot na"></span>Could not assess</li>
+    <li><span class="sw radar"></span>Radar: share of land that looks like open water</li><li><span class="sw line"></span>The rule’s line</li>
+  </ul>
+  <div class="board-head claims" aria-hidden="true"><div>Place</div><div>Radar</div><div>Rainfall</div><div>Outcome</div><div></div></div>
+  <ul class="board claims">
+<li><a class="claimrow" href="claim-kabonyo-kanyagwal.html">
+    <div class="c-name"><span class="name">Kabonyo Kanyagwal</span><span class="scale">Ward</span></div>
+    <div><span class="cell-label">Radar</span><div class="gauge" role="img" aria-label="Open water on 8.9% of land pixels; line at 5.0%"><i class="radar" style="width:89.3%"></i><b style="left:50.0%"></b></div><span class="pct">8.9% of land pixels</span></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot signed"></span>Claim opens</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="kabonyo-kanyagwal"><span class="snap">At deploy: both required sources signed, challenge window opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-kobura.html">
+    <div class="c-name"><span class="name">Kobura</span><span class="scale">Ward box; the report said village</span></div>
+    <div><span class="cell-label">Radar</span><div class="gauge" role="img" aria-label="Open water on 0.9% of land pixels; line at 5.0%"><i class="radar" style="width:9.5%"></i><b style="left:50.0%"></b></div><span class="pct">0.9% of land pixels</span></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot no"></span>No claim opens</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="kobura"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-ahero.html">
+    <div class="c-name"><span class="name">Ahero</span><span class="scale">Town, 3 km box around the town point</span></div>
+    <div><span class="cell-label">Radar</span><div class="gauge" role="img" aria-label="Open water on 0.7% of land pixels; line at 5.0%"><i class="radar" style="width:6.6%"></i><b style="left:50.0%"></b></div><span class="pct">0.7% of land pixels</span></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot no"></span>No claim opens</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="ahero"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-ombeyi.html">
+    <div class="c-name"><span class="name">Ombeyi</span><span class="scale">Location, measured on the ward box</span></div>
+    <div><span class="cell-label">Radar</span><div class="gauge" role="img" aria-label="Open water on 0.3% of land pixels; line at 5.0%"><i class="radar" style="width:2.8%"></i><b style="left:50.0%"></b></div><span class="pct">0.3% of land pixels</span></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot no"></span>No claim opens</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="ombeyi"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-kakola-ombaka.html">
+    <div class="c-name"><span class="name">Kakola Ombaka</span><span class="scale">Named area, no outline found</span></div>
+    <div><span class="cell-label">Radar</span><div class="hatch" role="img" aria-label="No radar measurement">no outline, not measured</div></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot na"></span>Cannot assess</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="kakola-ombaka"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-nyamasao.html">
+    <div class="c-name"><span class="name">Nyamasao</span><span class="scale">Dispensary, no outline found</span></div>
+    <div><span class="cell-label">Radar</span><div class="hatch" role="img" aria-label="No radar measurement">no outline, not measured</div></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot na"></span>Cannot assess</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="nyamasao"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+<li><a class="claimrow" href="claim-kadibo.html">
+    <div class="c-name"><span class="name">Kadibo</span><span class="scale">Sub-county, no outline found</span></div>
+    <div><span class="cell-label">Radar</span><div class="hatch" role="img" aria-label="No radar measurement">no outline, not measured</div></div>
+    <div><span class="cell-label">Rainfall</span><span class="sig"><span class="dot signed"></span>Signed</span></div>
+    <div><span class="cell-label">What the rule says</span><span class="out"><span class="dot na"></span>Cannot assess</span>
+      <span class="cell-label gap">On the testnet</span><span class="live" data-live-zone="kadibo"><span class="snap">At deploy: no claim opened</span></span></div>
+    <span class="go" aria-hidden="true">→</span>
+  </a></li>
+  </ul>
+  <p class="note">Boxes are working extents from OpenStreetMap, not surveyed flood outlines. 3 places were left unassessed rather than measured at the wrong location.
+  “What the rule says” is computed from the data. “On the testnet” is read from the contract. The six places without a claim are not hidden failures: the rule did not fire there, and the chain agrees.</p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 23 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

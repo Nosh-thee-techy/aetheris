@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kobura · Aetheris</title>
+<meta name="description" content="What radar and rainfall each said about Kobura for 4–6 May 2024, why the place was counted as flooded, and the live state of its claim on Sepolia.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="claim" data-zone="kobura">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html" aria-current="page">Claims</a><a href="backtest.html">Backtest</a><a href="payouts.html">Payouts</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <p class="crumb"><a href="claims.html">Claims</a> / Kobura</p>
+  <h1>Kobura, 4–6 May 2024</h1>
+  <p class="scale-line">Ward box; the report said village</p>
+  <div class="stage snapshot" data-live-stage>
+    <div class="stage-head"><span class="chip"><span class="dot no"></span>No claim opens</span></div>
+    <p class="stage-detail">At deploy: no claim opened. Live state loads below when scripting is on.</p>
+  </div>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>The reason for this decision</h2></div>
+  <div class="reason"><p>Radar found open water on 0.9% of land pixels, below the 5.0% line, so radar did not sign. Rainfall signed, but rainfall alone cannot open a claim. A report says this place flooded, so under this rule it is a miss. Radar sees open water only: flooding under crops, trees or buildings is invisible to it.</p></div>
+  <div class="two">
+    <div class="panel"><span class="who radar">Radar</span> <span class="sig"><span class="dot no"></span>Did not sign</span>
+      <div class="gap-s"><div class="gauge" role="img" aria-label="Open water on 0.9% of land pixels; line at 5.0%"><i class="radar" style="width:9.5%"></i><b style="left:50.0%"></b></div><span class="pct">0.9% of land pixels</span></div>
+      <dl><dt>Radar scene</dt><dd><a href="https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-1-rtc/items/S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_rtc">S1A_IW_GRDH_1SDV_20240506T155655_20240506T155720_053752_068803_rtc</a></dd><dt>Water test</dt><dd>VV below -16 dB, land pixels only</dd><dt>Land pixels read</dt><dd>1,448,140</dd><dt>Looked like water</dt><dd>13,746</dd><dt>Permanent water removed</dt><dd>40,820 pixels (JRC occurrence ≥ 90)</dd><dt>Area measured</dt><dd>OpenStreetMap ward bbox. The Star named a village; the village point was not found.</dd></dl></div>
+    <div class="panel"><span class="who rain">Rainfall</span> <span class="sig"><span class="dot signed"></span>Signed</span>
+      <div class="gap-s"><div class="gauge" role="img" aria-label="56.7 millimetres against a line at 40 millimetres"><i class="rain" style="width:70.9%"></i><b style="left:50.0%"></b></div>
+      <div class="gauge-scale"><span>0 mm</span><span>line 40 mm</span><span>80 mm</span></div></div>
+      <dl><dt>Total</dt><dd>56.7 mm over the three days to 6 May</dd>
+      <dt>Source</dt><dd>CHIRPS 2.0 daily, a satellite estimate</dd>
+      <dt>Where</dt><dd>Upstream catchment <code>nyando-headwaters-box-v1</code>, not this place</dd>
+      <dt>Line</dt><dd>40 mm over 3 days, lag 0 days</dd></dl></div>
+  </div>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Why this place was counted as flooded</h2></div>
+  <p class="note-wide">Rescue was underway in Kobura village on 5 May 2024 after the river burst the previous evening. The source says village, not the whole ward.</p>
+  <p class="note-wide"><a href="https://www.the-star.co.ke/news/2024-05-05-chopper-speed-boats-evacuate-flood-victims-in-nyando">The Star</a>, reported 4–5 May 2024. A news report is a label, not a survey.</p>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>What is on the testnet</h2>
+  <p>No signature exists for this place. The rule did not fire here, so neither attester signed, and the contract holds nothing for it. Silence counts as no.</p></div>
+  <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
+  <div data-live-signatures></div><ul class="tl" data-live-timeline hidden></ul>
+</div></section>
+<section class="block alt" id="actions"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>What can be done with this claim</h2>
+  <p>Five things can happen to a claim, and each belongs to someone. The buttons enable themselves only when the contract would accept them, judged by the chain’s clock. A refusal is explained in words.</p></div>
+  <div class="try"><b>To try it</b> you need a browser wallet on Sepolia with a little test ETH: 0.01 to challenge, plus gas. Reading needs no wallet.
+    If you challenge, the referee key is one key held by the project team, and it has 48 hours to decide. If it stays silent the claim stands and your stake comes back.</div>
+  <label class="confirm"><input type="checkbox" data-confirm-challenge> I understand a challenge stakes 0.01 Sepolia test ETH.</label>
+  <div class="acts" data-live-actions><p class="note">Reading the claim…</p></div>
+  <p class="txlog" data-tx-log hidden></p>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">05</span><h2>The identifiers, so you can recompute them</h2>
+  <p>The claim id is <code>keccak256(zoneId, eventWeek, ruleId, thresholdsHash)</code>. Change the rule and the id changes, so a claim cannot be moved onto a different rule.</p></div>
+  <dl class="ids">
+    <dt>Claim id</dt><dd><code>0xb0237e6f9fa0d1a62bd3c2dbf2fb7ba3cd804478b5780348c8b6088166e2a942</code></dd>
+    <dt>Zone id</dt><dd><code>0xa3eeb69be61e7a7f61a2ab313f47b72d0ed4ec319b89a1d9f92ed213625df745</code> = keccak256(“kobura”)</dd>
+    <dt>Event week</dt><dd><code>0xdd0d6e905256f09613adbb9271c3263bf7e2de8dda7975986730043a0e4b9515</code> = keccak256(“2024-05-04/2024-05-06”)</dd>
+    <dt>Rule id</dt><dd><code>0x4bd2fdf5a616bf18729fa6372829087a39d37a0ee5497b71f1a340a571dfae50</code> = keccak256(“nyando-open-water-v1”)</dd>
+    <dt>Thresholds hash</dt><dd><code>0x1c6711d40c3742d19b3da4368c97a56e8777cf19c845e2ec5b2608831f232d4b</code> = keccak256(config/rule.yaml)</dd>
+  </dl>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 23 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

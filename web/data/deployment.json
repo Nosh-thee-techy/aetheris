@@ -6,11 +6,13 @@
   "snapshot_at": "2026-10-23T06:31:51.637Z",
   "trigger": {
     "address": "0xFE35E6F742e7bdD2864AB753035F82047399E3D2",
-    "tx": "0x36a880f247dd147408047d0ba93bc4ececd664a30d13751197dcead28dbf2129"
+    "tx": "0x36a880f247dd147408047d0ba93bc4ececd664a30d13751197dcead28dbf2129",
+    "block": 11974883
   },
   "escrow": {
     "address": "0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1",
-    "tx": "0x57c8755b180c5e29abba713a676b2838df61c9b042857f4d54d260b0468da41f"
+    "tx": "0x57c8755b180c5e29abba713a676b2838df61c9b042857f4d54d260b0468da41f",
+    "block": 11974884
   },
   "roles": {
     "resolver": "0x7879c568aaA7EB06D8c4Eb54EBd0dd45CC3E9d54",

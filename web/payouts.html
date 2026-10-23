@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Payouts · Aetheris</title>
+<meta name="description" content="The testnet escrow behind Aetheris: the committed payout table, the pool, withdrawals, and the M-PESA sandbox mirror, which moves no money.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="payouts">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="payouts.html" aria-current="page">Payouts</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <p class="eyebrow">Payouts · testnet ETH · M-PESA sandbox</p>
+  <h1>Money moves once, and only after a claim finalizes</h1>
+  <p class="lede">Nothing on this page moves real money. The escrow holds Sepolia test ETH. The M-PESA step below is a labelled sandbox record and calls no payment service.</p>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>The escrow</h2>
+  <p>A contract holds testnet ETH and pays only a finalized claim, once, to a table fixed before any claim existed. The funder cannot take money back during the season, and can reclaim only what was never credited after it ends.</p></div>
+  <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
+  <div class="two">
+    <div class="panel"><h3>Pool</h3><div data-live-escrow><p class="note">Reading…</p></div></div>
+    <div class="panel"><h3>Contracts</h3><dl>
+      <dt>PayoutEscrow</dt><dd><a href="https://sepolia.etherscan.io/address/0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1"><code>0x70A0c3A7Fbd36d9E822CC11c19a7fD5B7b98A7d1</code></a></dd>
+      <dt>FloodTrigger</dt><dd><a href="https://sepolia.etherscan.io/address/0xFE35E6F742e7bdD2864AB753035F82047399E3D2"><code>0xFE35E6F742e7bdD2864AB753035F82047399E3D2</code></a></dd>
+      <dt>Funder</dt><dd><a href="https://sepolia.etherscan.io/address/0x657c2A0A1ffFF9ce544bb7e0B03714ADE1D8bC54"><code>0x657c2A0A1ffFF9ce544bb7e0B03714ADE1D8bC54</code></a></dd></dl></div>
+  </div>
+</div></section>
+
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Who gets paid, and when</h2>
+  <p>This table is the committed policy, read from the escrow. It was locked before the pool was funded, so it cannot change.</p></div>
+  <div class="warn"><b>The beneficiaries in this deployment are placeholders.</b> Each is an address derived from a hash, and nobody holds a key for it. A release would credit them correctly, and the ETH would then sit there. A real deployment commits real recipients, such as an insurer’s payout account or an aggregator’s wallet.</div>
+  <table class="grants"><caption>Committed grants, one per place</caption>
+    <thead><tr><th scope="col">Place</th><th scope="col">Beneficiary</th><th class="n" scope="col">Amount</th><th scope="col">Claim state</th></tr></thead>
+    <tbody data-live-grants><tr><td colspan="4">Reading…</td></tr></tbody></table>
+  <h3 class="h-small gap-l">Released so far</h3>
+  <ul class="tl" data-live-released><li>Reading…</li></ul>
+</div></section>
+
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Withdraw</h2>
+  <p>Money never gets pushed to anyone. Returned bonds, returned stakes, slashed bonds and payouts all wait as a balance that the owner pulls. Connect a wallet to see yours.</p></div>
+  <div class="acts" data-live-withdraw></div>
+  <p class="txlog" data-tx-log hidden></p>
+</div></section>
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>The M-PESA sandbox mirror</h2>
+  <p>When the escrow emits a release, <code>watcher/mirror.py</code> turns it into a record that a Daraja sandbox client could read. Today that is all it does.</p></div>
+  <div class="two">
+    <div class="panel"><span class="status wait">Sandbox</span><h3>What exists</h3>
+      <p>A function that copies one finalized release into a record. Every record is labelled <code>SANDBOX</code> and says no money moved.</p>
+      <p>It does not call Safaricom, hold credentials, or send shillings. It is not running as a service, so no record has been written for this deployment.</p></div>
+    <div class="panel"><h3>The shape of a record</h3>
+<pre class="cmd"><code>{
+  "label": "SANDBOX",
+  "rail": "daraja-sandbox",
+  "moved_kes": false,
+  "trigger_id": "&lt;claim id&gt;",
+  "zone": "&lt;place&gt;",
+  "amount_wei": &lt;wei released&gt;
+}</code></pre>
+      <p class="note">This is the format, not a payout. No example amount is shown, because none has been released.</p></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 23 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

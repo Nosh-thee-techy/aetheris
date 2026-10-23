@@ -1,0 +1,12 @@
+table,name,hits,misses,false_triggers,count
+rule,radar_only,1,6,0,
+rule,radar_plus_rainfall,1,6,0,
+rule,rainfall_only,7,0,0,
+agreement,both_yes,,,,1
+agreement,radar_only,,,,0
+agreement,rainfall_only,,,,3
+agreement,both_no,,,,0
+agreement,radar_abstain,,,,3
+agreement,rainfall_abstain,,,,0
+agreement,both_abstain,,,,0
+miss,no_scene,,0,,0
