@@ -37,8 +37,12 @@ const ZONES = {
 };
 const GRANT = parseEther("0.001");
 const DEPOSIT = parseEther("0.02");
-const TOPUP = { radar: parseEther("0.02"), rainfall: parseEther("0.02"), funder: parseEther("0.04") };
-const DEPLOYER_MIN = parseEther("0.1"); // top-ups (0.08) plus gas for two deploys and a dozen calls
+// Lean budget. Each attester needs its 0.01 ETH bond (one claim is signed) plus a little gas;
+// the funder needs the 0.02 ETH pool plus a little gas. The contract constants are unchanged.
+const TOPUP = { radar: parseEther("0.011"), rainfall: parseEther("0.011"), funder: parseEther("0.022") };
+// Top-ups (0.044) plus headroom for two deploys and a dozen calls. Sepolia gas is tiny at the
+// time of writing; if it spikes, send more ETH rather than lowering the bond or the pool.
+const DEPLOYER_MIN = parseEther("0.05");
 
 function readEnv() {
   const values = {};
