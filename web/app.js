@@ -55,6 +55,7 @@
     "function getTrigger(bytes32 id) view returns (tuple(bytes32 zoneId, bytes32 eventWeek, uint64 windowStart, uint64 resolveDeadline, uint8 state, address challenger, uint256 challengerStake, bool radarSigned, uint8 corroboratorCount, uint8 finalizationReason))",
     "function signersOf(bytes32 id) view returns (address[])",
     "function evidenceOf(bytes32 id, address who) view returns (bytes32)",
+    "function bondOf(bytes32 id, address who) view returns (uint256)",
     "function withdrawable(address who) view returns (uint256)",
     "function ruleId() view returns (bytes32)",
     "function thresholdsHash() view returns (bytes32)",
@@ -149,7 +150,12 @@
     if (claim.state !== 0) {
       var who = await trigger.signersOf(id);
       for (var i = 0; i < who.length; i++) {
-        claim.signers.push({ address: who[i], evidence: await trigger.evidenceOf(id, who[i]), radar: who[i].toLowerCase() === C.roles.radar.toLowerCase() });
+        claim.signers.push({
+          address: who[i],
+          evidence: await trigger.evidenceOf(id, who[i]),
+          bond: await trigger.bondOf(id, who[i]),
+          radar: who[i].toLowerCase() === C.roles.radar.toLowerCase()
+        });
       }
     }
     return claim;
@@ -336,6 +342,7 @@
       }
     }
     renderSignatures(z.claim);
+    renderStake(z, d);
     renderActions(z, d);
     if (!timelineLoaded) { timelineLoaded = true; loadTimeline(z.claim); }
   }
@@ -374,6 +381,40 @@
       row.appendChild(dl);
       host.appendChild(row);
     });
+  }
+
+  /* What each party stands to gain or lose on this claim, read from the contracts. */
+  var grantsCache = null;
+
+  async function loadGrants() {
+    if (grantsCache) return grantsCache;
+    grantsCache = await read(async function (provider) {
+      var escrow = new E.Contract(C.escrow.address, ESCROW_ABI, provider);
+      return escrow.grantsOf(ZONES[slug].zoneId);
+    });
+    return grantsCache;
+  }
+
+  async function renderStake(z, d) {
+    var host = $("[data-live-stake]");
+    if (!host) return;
+    var bonds = z.claim.signers.reduce(function (sum, s) { return sum + s.bond; }, 0n);
+    var stake = E.parseEther(C.constants.stakeEth);
+    var grants = null;
+    try { grants = await loadGrants(); } catch (err) { /* shown as unavailable below */ }
+    var promised = grants ? grants.reduce(function (sum, g) { return sum + g.amount; }, 0n) : null;
+    clear(host);
+    var dl = el("dl", "stake");
+    function row(k, v) { dl.appendChild(el("dt", null, k)); dl.appendChild(el("dd", null, v)); }
+    var eth = function (v) { return E.formatEther(v) + " ETH"; };
+    row("Held as attester bonds now", bonds > 0n ? eth(bonds) + " (returned when the claim finalizes)" : "Nothing. No one has signed here.");
+    row("Needed to challenge", C.constants.stakeEth + " ETH");
+    if (bonds > 0n) {
+      row("A challenger wins, if rejected", eth(bonds + stake) + " (their stake back, plus both bonds)");
+      row("A challenger loses, if upheld", C.constants.stakeEth + " ETH, paid to the slash pool");
+    }
+    row("Committed payout for this place", promised === null ? "Could not be read right now" : eth(promised) + (d.key === "finalized" ? (z.paid ? ", already paid once" : ", ready to release") : ", released once, and only after the claim finalizes"));
+    host.appendChild(dl);
   }
 
   /* ----------------------------------------------------------------- actions */
