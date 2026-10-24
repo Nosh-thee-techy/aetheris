@@ -375,6 +375,14 @@ def page_overview(places, counts, deployment) -> str:
   When that data misses their flood they get nothing, and the decision was made by a single operator, from an estimate, with no reason attached.</p></div>
   <p class="note">Aetheris attaches the reason. Each decision shows what each source measured, against which line, and who signed. It also counts how often the
   data misses real floods, so triggers can be designed more fairly over time. Today the benefit to farmers is indirect, and every payout in this demo is on a testnet or a sandbox.</p>
+  <h3 class="h-small gap-l">What the research says</h3>
+  <ul class="sources">
+    <li><b>Ground stations are few.</b> Africa’s average density of stations meeting WMO standards is eight times below the recommended level, and as of October 2024 Chad was reporting 3% of the surface observations it is required to. <a href="https://eos.org/features/building-better-weather-networks">Eos</a></li>
+    <li><b>Satellite rainfall is imperfect where it matters.</b> Against 596 TAHMO gauges, every product tested overestimated light rain and underestimated heavy rain (<a href="https://doi.org/10.1002/essoar.10509210.1">preprint</a>). In East Africa, CHIRPS had a 28% wet bias in daily rainfall (<a href="https://doi.org/10.1175/jhm-d-21-0161.1">published version</a>). Another study found CHIRPS missed 98% of the daily extreme-rain events its gauges recorded (<a href="https://doi.org/10.1175/jhm-d-21-0145.1">36 stations</a>). The studies differ on how good CHIRPS is, so read the numbers with care.</li>
+    <li><b>Ground data is gated.</b> ICPAC receives station data from national met services under bilateral agreements, and each service sets its own terms, some with cost recovery. <a href="https://www.icpac.net/events/regional-data-managers-biannual-meeting-on-climate-data-sharing-framework/">ICPAC</a></li>
+    <li><b>Index insurance already runs in Kenya on satellite triggers.</b> In 2021 Etherisc and ACRE Africa onboarded more than 17,000 smallholders and began paying some through M-Pesa. <a href="https://blog.etherisc.com/etherisc-update-etherisc-and-acre-africa-announce-first-payouts-through-blockchain-based-platform-a0c5194214f4">Etherisc</a> Those sources do not measure how often such triggers miss a real flood. That is what this project counts.</li>
+  </ul>
+  <div class="rule-line"><p><b>What is new here, and what is not.</b> We found no published open-code method that cross-validates gauge readings against satellite products. We did not search specifically for radar-versus-rainfall cross-checks, which may exist in the flood-mapping literature, so we do not claim the cross-check itself is new. What we add is recording each disagreement as a signed, challengeable public claim tied to a payout rule.</p></div>
 </div></section>
 
 <section class="block alt" id="how"><div class="wrap">
@@ -391,23 +399,36 @@ def page_overview(places, counts, deployment) -> str:
 </div></section>
 
 <section class="block" id="users"><div class="wrap">
-  <div class="sec-head"><span class="num">03</span><h2>Who this is for, and what each of them can do here</h2>
-  <p>Each person below has a different job. Each job has a page.</p></div>
-  <span class="flag">Working assumptions. Not yet validated with users.</span>
-  <div class="users">
-    <div class="user"><h3>Insurers and aggregators</h3><p>They set and defend flood triggers and carry the cost of disputes.</p>
-      <ul class="can"><li>Open a claim and read the reason for the decision, with the evidence hash recomputed in your browser.</li><li>Stake a challenge before the window closes.</li></ul>
-      <p><a href="claims.html">Go to claims →</a></p></div>
-    <div class="user"><h3>County teams and humanitarian agencies</h3><p>They need a second signal, from a different instrument, before funds or alerts go out.</p>
-      <ul class="can"><li>See which places have radar and rainfall both signed, and which have only one.</li><li>See what is missed: places reported flooded where no claim opened.</li></ul>
-      <p><a href="claims.html">Go to claims →</a></p></div>
-    <div class="user"><h3>ICPAC, Kenya Met and researchers</h3><p>They want an open, repeatable check on how reliable satellite rainfall is where gauges are scarce.</p>
-      <ul class="can"><li>Read the agreement counts and the three-rule comparison.</li><li>Download the data, rerun the scoring, and hash the frozen rule yourself.</li></ul>
-      <p><a href="backtest.html">Go to the backtest →</a></p></div>
-    <div class="user"><h3>Smallholder farmers and pastoralists</h3><p>The people most affected. They do not use this site. The benefit today is indirect.</p>
-      <ul class="can"><li>An insurer or responder can show them a claim page: what was measured, against which line, and why it did or did not open.</li></ul>
-      <p><a href="{first_open['page']}">See what that page looks like →</a></p></div>
-  </div>
+  <div class="sec-head"><span class="num">03</span><h2>Who this is for, and how we know</h2>
+  <p>The direct user is the <b>trigger analyst at an insurer or aggregator</b>: the person who decides what counts as a flood, owns the basis-risk problem, and can use a disagreement record. The people most affected, smallholders and pastoralists, are the beneficiaries, not the users. Data producers and researchers are the community we hope to help, not customers.</p></div>
+  <span class="flag">We have not interviewed anyone. The last column says which rows rest on research and which are our assumption.</span>
+  <table class="stakeholders">
+    <caption>Stakeholders, what each gains, and the basis for saying so</caption>
+    <thead><tr><th scope="col">Who</th><th scope="col">Problem they face</th><th scope="col">What Aetheris gives them</th><th scope="col">Basis</th></tr></thead>
+    <tbody>
+      <tr class="primary"><th scope="row">Insurers and aggregators <span class="tag">Direct user</span></th>
+        <td>Triggers can miss real floods or fire without loss (basis risk), and each dispute is costly to settle.</td>
+        <td>A per-zone record of where rainfall data and radar agree or disagree, to inform trigger design. <a href="claims.html">Claims →</a></td>
+        <td><b>Researched in part.</b> Satellite-triggered index insurance runs in Kenya at scale. That triggers miss floods is our reading of the field; no source above measures it.</td></tr>
+      <tr><th scope="row">Disaster responders <span class="note-s">County teams, Red Cross, agencies</span></th>
+        <td>Releasing funds or alerts on one forecast or one report is risky and hard to defend.</td>
+        <td>A second signal, from a different instrument, before funds or alerts move. <a href="claims.html">Claims →</a></td>
+        <td><b>Assumption.</b> Not researched.</td></tr>
+      <tr><th scope="row">Data producers <span class="note-s">ICPAC, Kenya Met</span></th>
+        <td>Gauges are sparse, station data is gated, and users cannot tell which satellite product to trust.</td>
+        <td>An open, repeatable reliability check they can compare against. <a href="backtest.html">Backtest →</a></td>
+        <td><b>Researched.</b> Station sparsity, data-sharing terms and rainfall bias are cited above.</td></tr>
+      <tr><th scope="row">Researchers and modellers</th>
+        <td>Validation studies contradict each other, and gauge data is hard to get.</td>
+        <td>An open, repeatable cross-check method. <a href="backtest.html">Backtest →</a></td>
+        <td><b>Researched.</b> The CHIRPS studies cited above disagree.</td></tr>
+      <tr><th scope="row">Smallholders and pastoralists <span class="note-s">Most affected. Many use feature phones.</span></th>
+        <td>Unpaid when the index misses their flood, with no visible reason.</td>
+        <td>Indirect: fairer triggers over time, and a visible reason for each decision that an insurer or responder can show them. <a href="{first_open['page']}">See one →</a></td>
+        <td><b>Assumption</b>, inferred from the basis-risk research.</td></tr>
+    </tbody>
+  </table>
+  <p class="note"><b>Next step to turn assumptions into evidence:</b> ask one insurer or aggregator whether a disagreement record like this would change how they set triggers. Until that answer exists, treat the rows marked “Assumption” as ours.</p>
 </div></section>
 
 <section class="block alt" id="built"><div class="wrap">
@@ -537,6 +558,7 @@ def page_claim(p: dict, deployment) -> str:
   <div class="sec-head"><span class="num">03</span><h2>What is on the testnet</h2>
   <p>The state below is read from the contract when you open this page. The evidence hashes are recomputed in your browser from the public text, so you can see that each signature names exactly the evidence described above.</p></div>
   {live_bar()}
+  <div class="panel stakebox"><h3>What is at stake</h3><div data-live-stake><p class="note">Reading…</p></div></div>
   <div class="two">
     <div><h3 class="h-small">Signatures</h3><div data-live-signatures><p class="note">Reading…</p></div>
       <p class="note">Expected radar hash: <code>{expect_radar}</code><br>Expected rainfall hash: <code>{expect_rain}</code></p></div>
@@ -548,6 +570,7 @@ def page_claim(p: dict, deployment) -> str:
   <div class="sec-head"><span class="num">03</span><h2>What is on the testnet</h2>
   <p>No signature exists for this place. The rule did not fire here, so neither attester signed, and the contract holds nothing for it. Silence counts as no.</p></div>
   {live_bar()}
+  <div class="panel stakebox"><h3>What is at stake</h3><div data-live-stake><p class="note">Reading…</p></div></div>
   <div data-live-signatures></div><ul class="tl" data-live-timeline hidden></ul>
 </div></section>"""
     else:
