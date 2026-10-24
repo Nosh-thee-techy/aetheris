@@ -285,7 +285,7 @@
   function render() {
     if (page === "claims") renderClaims();
     if (page === "claim") renderClaimPage();
-    if (page === "payouts") renderPayouts();
+    if (page === "claims") renderPayouts();
     tickCountdowns();
     updateWalletUi();
   }
@@ -768,9 +768,9 @@
   var refreshButton = $("[data-refresh]");
   if (refreshButton) refreshButton.addEventListener("click", function () { timelineLoaded = false; refresh(); });
   wireRuleCheck();
-  if (page === "claims" || page === "claim" || page === "payouts") {
+  if (page === "claims" || page === "claim") {
     refresh();
     setInterval(function () { if (!document.hidden) refresh(); }, 45000);
   }
-  if (page === "payouts") renderWithdraw();
+  if (page === "claims") renderWithdraw();
 })();

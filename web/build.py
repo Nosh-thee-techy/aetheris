@@ -7,7 +7,7 @@ Pages written
   claims.html           the seven places for the flood week, with live testnet state
   claim-<place>.html    one page per place: evidence, signatures, timeline, actions
   backtest.html         agreement counts, rule check, downloads, how to reproduce
-  payouts.html          the escrow, the committed table, the sandbox mirror
+                        (claims.html also ends with the escrow, the committed table, withdrawals, the sandbox mirror)
   chain-config.js       addresses, ids and the rule file, read by app.js
   data/                 copies of the files the numbers come from
 
@@ -246,7 +246,6 @@ NAV = [
     ("index.html", "Overview", "overview"),
     ("claims.html", "Claims", "claims"),
     ("backtest.html", "Backtest", "backtest"),
-    ("payouts.html", "Payouts", "payouts"),
 ]
 
 
@@ -495,6 +494,7 @@ def page_claims(places, deployment) -> str:
   <p class="lede">News reports named these seven places as flooded. For each one, the rule asks radar and rainfall whether they sign. Where both do, a claim opens on the testnet and anyone can challenge it. Pick a place to see the evidence and the actions open to you.</p>
   {live_bar()}
   <p class="tally" data-live-tally></p>
+  <p class="note"><a href="#escrow">Jump to the payout escrow and your withdrawals ↓</a> Nothing here moves real money. M-PESA is a labelled sandbox.</p>
 </div></section>
 
 <section class="block tight"><div class="wrap">
@@ -516,10 +516,11 @@ def page_claims(places, deployment) -> str:
   </ul>
   <p class="note">Boxes are working extents from OpenStreetMap, not surveyed flood outlines. {unassessed} places were left unassessed rather than measured at the wrong location.
   “What the rule says” is computed from the data. “On the testnet” is read from the contract. The six places without a claim are not hidden failures: the rule did not fire there, and the chain agrees.</p>
-</div></section>"""
+</div></section>
+{escrow_sections(deployment)}"""
     return shell(
         title="Claims · Aetheris",
-        desc="The seven places reported flooded in the Nyando basin, 4–6 May 2024, with what radar and rainfall each said and the live state of each claim on Sepolia.",
+        desc="The seven places reported flooded in the Nyando basin, 4–6 May 2024, with what radar and rainfall each said, the live state of each claim on Sepolia, and the payout escrow.",
         key="claims",
         page="claims",
         body=body,
@@ -794,14 +795,14 @@ python web/build.py               # rebuilds these pages from the same files</co
 # payouts
 
 
-def page_payouts(deployment) -> str:
+def escrow_sections(deployment) -> str:
+    """The escrow, the committed table, withdrawals and the sandbox mirror. They sit at the foot of the claims page."""
     if not deployment:
         main = '<section class="block"><div class="wrap"><div class="sec-head"><h2>Not deployed yet</h2></div></div></section>'
     else:
-        main = f"""<section class="block"><div class="wrap">
-  <div class="sec-head"><span class="num">01</span><h2>The escrow</h2>
+        main = f"""<section class="block" id="escrow"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>Payouts: the escrow</h2>
   <p>A contract holds testnet ETH and pays only a finalized claim, once, to a table fixed before any claim existed. The funder cannot take money back during the season, and can reclaim only what was never credited after it ends.</p></div>
-  {live_bar()}
   <div class="two">
     <div class="panel"><h3>Pool</h3><div data-live-escrow><p class="note">Reading…</p></div></div>
     <div class="panel"><h3>Contracts</h3><dl>
@@ -828,12 +829,7 @@ def page_payouts(deployment) -> str:
   <div class="acts" data-live-withdraw></div>
   <p class="txlog" data-tx-log hidden></p>
 </div></section>"""
-    body = f"""<section class="page-head"><div class="wrap">
-  <p class="eyebrow">Payouts · testnet ETH · M-PESA sandbox</p>
-  <h1>Money moves once, and only after a claim finalizes</h1>
-  <p class="lede">Nothing on this page moves real money. The escrow holds Sepolia test ETH. The M-PESA step below is a labelled sandbox record and calls no payment service.</p>
-</div></section>
-{main}
+    return f"""{main}
 <section class="block alt"><div class="wrap">
   <div class="sec-head"><span class="num">04</span><h2>The M-PESA sandbox mirror</h2>
   <p>When the escrow emits a release, <code>watcher/mirror.py</code> turns it into a record that a Daraja sandbox client could read. Today that is all it does.</p></div>
@@ -853,13 +849,6 @@ def page_payouts(deployment) -> str:
       <p class="note">This is the format, not a payout. No example amount is shown, because none has been released.</p></div>
   </div>
 </div></section>"""
-    return shell(
-        title="Payouts · Aetheris",
-        desc="The testnet escrow behind Aetheris: the committed payout table, the pool, withdrawals, and the M-PESA sandbox mirror, which moves no money.",
-        key="payouts",
-        page="payouts",
-        body=body,
-    )
 
 
 # ----------------------------------------------------------------------------
@@ -886,7 +875,7 @@ def render_all() -> tuple[dict[str, str], dict]:
     deployment = json.loads(DEPLOYMENT.read_text(encoding="utf-8")) if DEPLOYMENT.exists() else None
     config = build_config(deployment, places)
     pages = {"index.html": page_overview(places, counts, deployment), "claims.html": page_claims(places, deployment),
-             "backtest.html": page_backtest(places, counts), "payouts.html": page_payouts(deployment)}
+             "backtest.html": page_backtest(places, counts)}
     for p in places:
         pages[p["page"]] = page_claim(p, deployment)
     return pages, config

@@ -149,7 +149,7 @@ python web/build.py        # writes the pages, chain-config.js and web/data/
 start web/index.html       # opens from disk; no server needed
 ```
 
-Pages: Overview, Claims, one page per place, Backtest, Payouts. `build.py` computes the claim ids and evidence hashes and **fails the build** if they disagree with `web/data/deployment.json`. `app.js` reads Sepolia in the browser and holds no keys. Writes (challenge, finalize, release, withdraw) go through the visitor's own wallet. The only library is a vendored copy of ethers 6.17.0 in `web/vendor/`. Nothing loads from a CDN.
+Pages: Overview, Claims (which ends with the payout escrow and withdrawals), one page per place, Backtest. `build.py` computes the claim ids and evidence hashes and **fails the build** if they disagree with `web/data/deployment.json`. `app.js` reads Sepolia in the browser and holds no keys. Writes (challenge, finalize, release, withdraw) go through the visitor's own wallet. The only library is a vendored copy of ethers 6.17.0 in `web/vendor/`. Nothing loads from a CDN.
 
 ### The contract tools
 
