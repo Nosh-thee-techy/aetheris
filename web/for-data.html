@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data workspace · Aetheris</title>
+<meta name="description" content="How CHIRPS and Sentinel-1 each behaved on the Nyando flood week, with downloads and a way to hash the frozen rule.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="workspace">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html" aria-current="page">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+  <p class="eyebrow">Data workspace · ICPAC, Kenya Met</p>
+  <h1>An open check on the products you already publish</h1>
+  <p class="lede">CHIRPS signed every place because it is one catchment reading. Sentinel-1 could look at 4 of 7 places. The rest had no outline we would measure. Compare this against your own stations or your own rainfall field.</p>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>How each source behaved</h2></div>
+  <div class="layers">
+    <div class="layer">
+      <h3>CHIRPS 2.0 daily</h3>
+      <p class="n-lg">56.7 mm</p>
+      <p>Signed 7 of 7. One upstream catchment, applied everywhere. A millimetre total here is not a gauge total.</p>
+    </div>
+    <div class="layer">
+      <h3>Sentinel-1 RTC</h3>
+      <p class="n-lg">4/7</p>
+      <p>Assessed 4. Signed 1. Below the line 3. No geometry 3: Kakola Ombaka, Nyamasao, Kadibo.</p>
+    </div>
+  </div>
+  <div class="matrix-wrap gap-l">
+    <div><table class="matrix">
+  <caption>Radar (rows) against rainfall (columns), 7 places reported flooded</caption>
+  <thead><tr><th></th><th scope="col">Rainfall signed</th><th scope="col">Rainfall did not sign</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Radar signed</th><td><span class="big">1</span><small>Kabonyo Kanyagwal</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar did not sign</th><td class="hl"><span class="big">3</span><small>Kobura, Ahero, Ombeyi</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar not assessed</th><td><span class="big">3</span><small>Kakola Ombaka, Nyamasao, Kadibo</small></td><td class="zero n">0</td></tr>
+  </tbody>
+</table></div>
+    <div><table>
+  <caption>Why the reported floods that produced no claim were missed</caption>
+  <thead><tr><th></th><th class="n">Places</th></tr></thead>
+  <tbody><tr><th scope="row">Radar had no pass that week</th><td class="n">0</td></tr><tr><th scope="row">Radar saw too little open water</th><td class="n">0</td></tr><tr><th scope="row">Radar signed, the second source did not</th><td class="n">0</td></tr><tr><th scope="row">Rainfall data was missing</th><td class="n">0</td></tr><tr><th scope="row">No outline to measure, radar not run</th><td class="n">0</td></tr></tbody>
+</table></div>
+  </div>
+</div></section>
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Take the files and the hash</h2>
+  <p>The rule on the chain is a hash of <code>config/rule.yaml</code>. If the bytes change, the hash will not match.</p></div>
+  <ul class="downloads"><li><a href="data/counts.csv" download>counts.csv</a><span>Every count on this site</span></li><li><a href="data/radar_fractions.csv" download>radar_fractions.csv</a><span>Radar fraction and pixel counts</span></li><li><a href="data/observations.csv" download>observations.csv</a><span>What each source signed</span></li><li><a href="data/rule.yaml" download>rule.yaml</a><span>The frozen rule, byte for byte</span></li></ul>
+  <p class="cta"><a class="btn primary" href="backtest.html#check">Hash the rule against the contract</a></p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

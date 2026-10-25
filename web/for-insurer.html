@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insurer workspace · Aetheris</title>
+<meta name="description" content="What each trigger rule would have done in the Nyando basin in the week of 4–6 May 2024, and the one live claim you can challenge.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="workspace">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html" aria-current="page">Insurer</a><a href="for-reinsurer.html">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+  <p class="eyebrow">Insurer workspace · trigger design</p>
+  <h1>Your rainfall trigger would have paid 7. This rule paid 1.</h1>
+  <p class="lede">That gap is the basis-risk record. Rainfall signed everywhere because it is read once, on the upstream catchment. Radar looks at each place. Use the disagreement to defend a stricter trigger, or to argue the line is too high.</p>
+  <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>What each rule would have done</h2>
+  <p>Same seven places, same week, three rules. False triggers stay at zero because this log has no “did not flood” labels.</p></div>
+  <div class="matrix-wrap">
+    <div><table>
+  <caption>Three rules on the same seven places</caption>
+  <thead><tr><th></th><th class="n">Found</th><th class="n">Missed</th><th class="n">False triggers</th></tr></thead>
+  <tbody><tr><th scope="row">Radar only</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Radar and rainfall (the rule)</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Rainfall only</th><td class="n">7</td><td class="n">0</td><td class="n">0</td></tr></tbody>
+</table></div>
+    <div><table class="matrix">
+  <caption>Radar (rows) against rainfall (columns), 7 places reported flooded</caption>
+  <thead><tr><th></th><th scope="col">Rainfall signed</th><th scope="col">Rainfall did not sign</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Radar signed</th><td><span class="big">1</span><small>Kabonyo Kanyagwal</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar did not sign</th><td class="hl"><span class="big">3</span><small>Kobura, Ahero, Ombeyi</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar not assessed</th><td><span class="big">3</span><small>Kakola Ombaka, Nyamasao, Kadibo</small></td><td class="zero n">0</td></tr>
+  </tbody>
+</table></div>
+  </div>
+</div></section>
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Place by place</h2>
+  <p>Rainfall: 56.7 mm against a line at 40 mm, one answer for every place. Radar line: 5.0% of land pixels.</p></div>
+  <div class="matrix-wrap"><div>
+  <table class="grants"><caption>Trigger outcome per place</caption>
+    <thead><tr><th scope="col">Place</th><th scope="col">Rainfall</th><th scope="col">Radar</th><th scope="col">This rule</th><th scope="col">On the testnet</th></tr></thead>
+    <tbody><tr>
+    <th scope="row"><a href="claim-kabonyo-kanyagwal.html">Kabonyo Kanyagwal</a><span class="note-s">Ward</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="dot signed"></span> Would open</td>
+    <td class="live" data-live-zone="kabonyo-kanyagwal"><span class="snap">At deploy: both required sources signed, challenge window opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-kobura.html">Kobura</a><span class="note-s">Ward box; the report said village</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot no"></span>Did not sign</span></td>
+    <td><span class="dot no"></span> Rainfall only — no claim</td>
+    <td class="live" data-live-zone="kobura"><span class="snap">At deploy: no claim opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-ahero.html">Ahero</a><span class="note-s">Town, 3 km box around the town point</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot no"></span>Did not sign</span></td>
+    <td><span class="dot no"></span> Rainfall only — no claim</td>
+    <td class="live" data-live-zone="ahero"><span class="snap">At deploy: no claim opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-ombeyi.html">Ombeyi</a><span class="note-s">Location, measured on the ward box</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot no"></span>Did not sign</span></td>
+    <td><span class="dot no"></span> Rainfall only — no claim</td>
+    <td class="live" data-live-zone="ombeyi"><span class="snap">At deploy: no claim opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-kakola-ombaka.html">Kakola Ombaka</a><span class="note-s">Named area, no outline found</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot na"></span>Not assessed</span></td>
+    <td><span class="dot na"></span> Cannot assess</td>
+    <td class="live" data-live-zone="kakola-ombaka"><span class="snap">At deploy: no claim opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-nyamasao.html">Nyamasao</a><span class="note-s">Dispensary, no outline found</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot na"></span>Not assessed</span></td>
+    <td><span class="dot na"></span> Cannot assess</td>
+    <td class="live" data-live-zone="nyamasao"><span class="snap">At deploy: no claim opened</span></td>
+  </tr><tr>
+    <th scope="row"><a href="claim-kadibo.html">Kadibo</a><span class="note-s">Sub-county, no outline found</span></th>
+    <td><span class="sig"><span class="dot signed"></span>Signed</span></td>
+    <td><span class="sig"><span class="dot na"></span>Not assessed</span></td>
+    <td><span class="dot na"></span> Cannot assess</td>
+    <td class="live" data-live-zone="kadibo"><span class="snap">At deploy: no claim opened</span></td>
+  </tr></tbody>
+  </table></div></div>
+  <p class="note">3 places have no outline we would stand behind. That is a geometry problem, not a weather problem, and it should not be priced as “no flood”.</p>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>The one live claim</h2>
+  <p>Kabonyo Kanyagwal is the only place both sources signed. Anyone can challenge it. The referee is one named key.</p></div>
+  <p class="cta"><a class="btn primary" href="claim-kabonyo-kanyagwal.html">Open Kabonyo Kanyagwal</a> <a class="btn" href="claims.html">All claims</a></p>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

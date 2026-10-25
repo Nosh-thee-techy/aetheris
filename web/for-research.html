@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research workspace · Aetheris</title>
+<meta name="description" content="The open method, the agreement table, and the files needed to reproduce the Nyando flood-week counts.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="workspace">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html">Data</a><a href="for-research.html" aria-current="page">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+  <p class="eyebrow">Research workspace · open method</p>
+  <h1>Repeat the count. Do not take the page on trust.</h1>
+  <p class="lede">The question is not “how accurate is CHIRPS”. Published studies already disagree on that. The question is: on this week, in these seven named places, where did rainfall and radar agree, and where did they not? The answer is a count.</p>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>Agreement</h2></div>
+  <div class="matrix-wrap">
+    <div><table class="matrix">
+  <caption>Radar (rows) against rainfall (columns), 7 places reported flooded</caption>
+  <thead><tr><th></th><th scope="col">Rainfall signed</th><th scope="col">Rainfall did not sign</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Radar signed</th><td><span class="big">1</span><small>Kabonyo Kanyagwal</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar did not sign</th><td class="hl"><span class="big">3</span><small>Kobura, Ahero, Ombeyi</small></td><td class="zero n">0</td></tr>
+    <tr><th scope="row">Radar not assessed</th><td><span class="big">3</span><small>Kakola Ombaka, Nyamasao, Kadibo</small></td><td class="zero n">0</td></tr>
+  </tbody>
+</table></div>
+    <div><table>
+  <caption>Three rules on the same seven places</caption>
+  <thead><tr><th></th><th class="n">Found</th><th class="n">Missed</th><th class="n">False triggers</th></tr></thead>
+  <tbody><tr><th scope="row">Radar only</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Radar and rainfall (the rule)</th><td class="n">1</td><td class="n">6</td><td class="n">0</td></tr><tr><th scope="row">Rainfall only</th><td class="n">7</td><td class="n">0</td><td class="n">0</td></tr></tbody>
+</table></div>
+  </div>
+</div></section>
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Download and reproduce</h2></div>
+  <ul class="downloads"><li><a href="data/counts.csv" download>counts.csv</a><span>Every count on this site · <code>backtest/results/counts.csv</code></span></li><li><a href="data/label_log.csv" download>label_log.csv</a><span>The seven places and the reports that named them · <code>labels/label_log.csv</code></span></li><li><a href="data/radar_fractions.csv" download>radar_fractions.csv</a><span>Radar fraction and pixel counts per place · <code>backtest/checks/radar_fractions.csv</code></span></li><li><a href="data/observations.csv" download>observations.csv</a><span>What each source signed, per place · <code>backtest/observations.csv</code></span></li><li><a href="data/rule.yaml" download>rule.yaml</a><span>The frozen rule, byte for byte · <code>config/rule.yaml</code></span></li></ul>
+<pre class="cmd"><code>python -m backtest.score
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline
+python web/build.py</code></pre>
+  <p class="cta"><a class="btn" href="backtest.html">Full backtest page</a> <a class="btn" href="backtest.html#check">Hash the rule</a></p>
+</div></section>
+<section class="block"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>What this cannot tell you</h2></div>
+  <ul class="limits">
+    <li><b>No “did not flood” labels.</b><span>Without them there are no false alarms, so no precision, and we publish none.</span></li>
+    <li><b>One week.</b><span>Nothing here is a skill score for another season.</span></li>
+    <li><b>Boxes are not flood outlines.</b><span>A ward box mixes dry and wet land.</span></li>
+  </ul>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>

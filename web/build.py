@@ -7,6 +7,13 @@ Pages written
   claims.html           the seven places for the flood week, with live testnet state
   claim-<place>.html    one page per place: evidence, signatures, timeline, actions
   backtest.html         agreement counts, rule check, downloads, how to reproduce
+  workspaces.html       hub: a tool for each stakeholder
+  for-insurer.html      trigger-design board (rainfall-only vs this rule)
+  for-reinsurer.html    event-loss layers (hazard, exposure, modeled, unmodeled)
+  for-responder.html    second-signal action board
+  for-data.html         source reliability for ICPAC / Kenya Met
+  for-research.html     open method and downloads
+  for-farmer.html       plain-language reason, no wallet
                         (claims.html also ends with the escrow, the committed table, withdrawals, the sandbox mirror)
   chain-config.js       addresses, ids and the rule file, read by app.js
   data/                 copies of the files the numbers come from
@@ -44,6 +51,7 @@ from backtest.pipeline.ids import CHIRPS, event_week, evidence_radar, evidence_r
 from backtest.pipeline.rainfall import published_total  # noqa: E402
 from backtest.pipeline.report import PUBLISHED_ITEM  # noqa: E402
 from backtest.pipeline.rule import load_rule, rule_id, thresholds_hash  # noqa: E402
+from web import workspaces  # noqa: E402
 
 WEB = ROOT / "web"
 DEPLOYMENT = WEB / "data" / "deployment.json"
@@ -246,6 +254,7 @@ NAV = [
     ("index.html", "Overview", "overview"),
     ("claims.html", "Claims", "claims"),
     ("backtest.html", "Backtest", "backtest"),
+    ("workspaces.html", "Workspaces", "workspaces"),
 ]
 
 
@@ -360,7 +369,7 @@ def page_overview(places, counts, deployment) -> str:
   <p class="lede">Flood payouts and alerts rest on satellite rainfall estimates that are sparse on the ground and often wrong in heavy rain.
   <strong>Aetheris checks them against Sentinel-1 radar</strong>, which sees whether land is actually under water, for each place and week,
   and records the result where anyone can check it or challenge it. This is the first week we checked: the Nyando basin, {WEEK_TEXT}.</p>
-  <p class="cta"><a class="btn primary" href="claims.html">See the claims</a> <a class="btn" href="{first_open['page']}">Open the one live claim</a> <a class="btn" href="backtest.html">Read the backtest</a></p>
+  <p class="cta"><a class="btn primary" href="workspaces.html">Open a workspace</a> <a class="btn" href="claims.html">See the claims</a> <a class="btn" href="{first_open['page']}">Open the one live claim</a> <a class="btn" href="backtest.html">Read the backtest</a></p>
   <div class="facts">
     <div class="fact"><span class="n">{n}</span><span class="k">places that news reports said flooded</span></div>
     <div class="fact"><span class="n rain">{rain_signed}</span><span class="k">where rainfall data signed “flood”</span></div>
@@ -407,23 +416,27 @@ def page_overview(places, counts, deployment) -> str:
     <tbody>
       <tr class="primary"><th scope="row">Insurers and aggregators <span class="tag">Direct user</span></th>
         <td>Triggers can miss real floods or fire without loss (basis risk), and each dispute is costly to settle.</td>
-        <td>A per-zone record of where rainfall data and radar agree or disagree, to inform trigger design. <a href="claims.html">Claims →</a></td>
+        <td>A trigger-design board: what rainfall-only would pay, what this rule pays, and the live claim. <a href="for-insurer.html">Insurer workspace →</a></td>
         <td><b>Researched in part.</b> Satellite-triggered index insurance runs in Kenya at scale. That triggers miss floods is our reading of the field; no source above measures it.</td></tr>
+      <tr><th scope="row">Reinsurers</th>
+        <td>They price and hold catastrophe risk, and need a transparent event footprint they can put in their own model.</td>
+        <td>One named event, layered as hazard, exposure, modeled loss and unmodeled residual. Not a stochastic cat model. <a href="for-reinsurer.html">Event loss →</a></td>
+        <td><b>Assumption.</b> Shaped like a cat-model event because that is how they already read a flood. We have not interviewed a reinsurer.</td></tr>
       <tr><th scope="row">Disaster responders <span class="note-s">County teams, Red Cross, agencies</span></th>
         <td>Releasing funds or alerts on one forecast or one report is risky and hard to defend.</td>
-        <td>A second signal, from a different instrument, before funds or alerts move. <a href="claims.html">Claims →</a></td>
+        <td>An action board: second signal, rainfall only, cannot assess. <a href="for-responder.html">Responder workspace →</a></td>
         <td><b>Assumption.</b> Not researched.</td></tr>
       <tr><th scope="row">Data producers <span class="note-s">ICPAC, Kenya Met</span></th>
         <td>Gauges are sparse, station data is gated, and users cannot tell which satellite product to trust.</td>
-        <td>An open, repeatable reliability check they can compare against. <a href="backtest.html">Backtest →</a></td>
+        <td>A reliability check on CHIRPS and Sentinel-1, with files and a hash. <a href="for-data.html">Data workspace →</a></td>
         <td><b>Researched.</b> Station sparsity, data-sharing terms and rainfall bias are cited above.</td></tr>
       <tr><th scope="row">Researchers and modellers</th>
         <td>Validation studies contradict each other, and gauge data is hard to get.</td>
-        <td>An open, repeatable cross-check method. <a href="backtest.html">Backtest →</a></td>
+        <td>The open method, the counts, and the commands that rebuild them. <a href="for-research.html">Research workspace →</a></td>
         <td><b>Researched.</b> The CHIRPS studies cited above disagree.</td></tr>
       <tr><th scope="row">Smallholders and pastoralists <span class="note-s">Most affected. Many use feature phones.</span></th>
         <td>Unpaid when the index misses their flood, with no visible reason.</td>
-        <td>Indirect: fairer triggers over time, and a visible reason for each decision that an insurer or responder can show them. <a href="{first_open['page']}">See one →</a></td>
+        <td>A plain-language page an insurer or responder can show them. <a href="for-farmer.html">Farmer view →</a></td>
         <td><b>Assumption</b>, inferred from the basis-risk research.</td></tr>
     </tbody>
   </table>
@@ -876,6 +889,7 @@ def render_all() -> tuple[dict[str, str], dict]:
     config = build_config(deployment, places)
     pages = {"index.html": page_overview(places, counts, deployment), "claims.html": page_claims(places, deployment),
              "backtest.html": page_backtest(places, counts)}
+    pages.update(workspaces.render_all(sys.modules[__name__], places, counts, deployment))
     for p in places:
         pages[p["page"]] = page_claim(p, deployment)
     return pages, config

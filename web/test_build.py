@@ -33,6 +33,25 @@ class SiteTests(unittest.TestCase):
         for slug in build.PLACES:
             self.assertIn(f"claim-{slug}.html", self.pages)
 
+    def test_every_workspace_exists(self) -> None:
+        for name in (
+            "workspaces.html",
+            "for-insurer.html",
+            "for-reinsurer.html",
+            "for-responder.html",
+            "for-data.html",
+            "for-research.html",
+            "for-farmer.html",
+        ):
+            self.assertIn(name, self.pages)
+
+    def test_reinsurer_page_is_one_event_not_a_cat_model(self) -> None:
+        html = self.pages["for-reinsurer.html"]
+        self.assertIn("Not a catastrophe model", html)
+        self.assertNotRegex(html, r"(?i)\baverage annual loss\b.*\d")
+        self.assertNotRegex(html, r"(?i)\bprobable maximum loss\b.*\d")
+        self.assertNotRegex(html, r"(?i)\breturn period of\b")
+
     def test_internal_links_resolve(self) -> None:
         """Every local href and src points at a page or file that exists, and every #fragment exists."""
         pattern = re.compile(r'(?:href|src)="([^"]+)"')

@@ -283,7 +283,7 @@
   }
 
   function render() {
-    if (page === "claims") renderClaims();
+    if (page === "claims" || page === "workspace") renderClaims();
     if (page === "claim") renderClaimPage();
     if (page === "claims") renderPayouts();
     tickCountdowns();
@@ -768,7 +768,7 @@
   var refreshButton = $("[data-refresh]");
   if (refreshButton) refreshButton.addEventListener("click", function () { timelineLoaded = false; refresh(); });
   wireRuleCheck();
-  if (page === "claims" || page === "claim") {
+  if (page === "claims" || page === "claim" || page === "workspace") {
     refresh();
     setInterval(function () { if (!document.hidden) refresh(); }, 45000);
   }

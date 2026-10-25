@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reinsurer workspace · event loss · Aetheris</title>
+<meta name="description" content="Hazard, exposure, modeled loss and the unmodeled residual for one named Nyando flood. One event, not a catastrophe model.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="workspace">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+</div></header>
+
+<main id="main">
+<section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html" aria-current="page">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+  <p class="eyebrow">Reinsurer workspace · event loss</p>
+  <h1>Nyando basin, 4–6 May 2024. One event. <em>Not a catastrophe model.</em></h1>
+  <p class="lede">A cat model needs thousands of simulated years, a vulnerability function, and your own exposure file. What we can give you honestly is the footprint of one named flood, layered the way you already read an event: hazard, exposure, modeled loss, and the residual the rule left unmodeled. Put it in your model. Do not treat this page as the model.</p>
+  <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
+  <div class="facts">
+    <div class="fact"><span class="n">1</span><span class="k">place the rule modeled as a loss</span></div>
+    <div class="fact"><span class="n rain">6</span><span class="k">reported floods left unmodeled</span></div>
+    <div class="fact"><span class="n radar">0.001</span><span class="k">ETH modeled · 0.007 ETH if the trigger were rainfall only. Demo amounts, not sums insured.</span></div>
+  </div>
+</div></section>
+
+<section class="block" id="hazard"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>Hazard</h2>
+  <p>Two measurements of the same storm. They are not two independent witnesses.</p></div>
+  <div class="layers">
+    <div class="layer">
+      <h3>Rainfall · CHIRPS 2.0</h3>
+      <p class="n-lg">56.7 mm</p>
+      <p>Three-day catchment total against a line at 40 mm. One reading, applied to every place. Signed in 7 of 7.</p>
+    </div>
+    <div class="layer">
+      <h3>Radar · Sentinel-1</h3>
+      <p class="n-lg">1 signed</p>
+      <p>Open water on a place’s land, permanent water removed, line at 5.0%. 3 below the line. 3 not measured.</p>
+    </div>
+  </div>
+  <div class="matrix-wrap gap-l"><div>
+  <table class="grants"><caption>Radar fraction against the 5.0% line</caption>
+    <thead><tr><th scope="col">Place</th><th class="n" scope="col">Open water</th><th scope="col">Against the line</th><th scope="col">Radar</th></tr></thead>
+    <tbody><tr><th scope='row'>Kabonyo Kanyagwal</th><td class='n'>8.9%</td><td>Above the line</td><td><span class="sig"><span class="dot signed"></span>Signed</span></td></tr><tr><th scope='row'>Kobura</th><td class='n'>0.9%</td><td>Below the line</td><td><span class="sig"><span class="dot no"></span>Did not sign</span></td></tr><tr><th scope='row'>Ahero</th><td class='n'>0.7%</td><td>Below the line</td><td><span class="sig"><span class="dot no"></span>Did not sign</span></td></tr><tr><th scope='row'>Ombeyi</th><td class='n'>0.3%</td><td>Below the line</td><td><span class="sig"><span class="dot no"></span>Did not sign</span></td></tr><tr><th scope='row'>Kakola Ombaka</th><td class='n'>—</td><td>No outline. Not measured.</td><td><span class="sig"><span class="dot na"></span>Not assessed</span></td></tr><tr><th scope='row'>Nyamasao</th><td class='n'>—</td><td>No outline. Not measured.</td><td><span class="sig"><span class="dot na"></span>Not assessed</span></td></tr><tr><th scope='row'>Kadibo</th><td class='n'>—</td><td>No outline. Not measured.</td><td><span class="sig"><span class="dot na"></span>Not assessed</span></td></tr></tbody>
+  </table></div></div>
+</div></section>
+
+<section class="block alt" id="exposure"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Exposure</h2>
+  <p>Each place carries a demo grant of 0.001 ETH, posted so the escrow can show a payout. The beneficiaries are placeholder addresses. A real treaty would load your own sums insured and your own recipients here.</p></div>
+  <dl class="stake">
+    <dt>Places in the book</dt><dd>7</dd>
+    <dt>Demo sum per place</dt><dd>0.001 ETH</dd>
+    <dt>Ground-up if every reported place paid</dt><dd>0.007 ETH · hypothetical, news reports are not a loss survey</dd>
+    <dt>Season end</dt><dd>Locked in the escrow. The funder cannot pull committed funds during the season.</dd>
+  </dl>
+</div></section>
+
+<section class="block" id="loss"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Loss</h2>
+  <p>Three ways to count the same week. The bars are counts of places, not a return period.</p></div>
+  <ol class="lossbars">
+    <li><span class="lb-lab">If every reported place paid</span><span class="lb-bar" style="width:100%"><span>7 places · 0.007 ETH</span></span><span class="lb-note">Hypothetical. Reports are not claims.</span></li>
+    <li><span class="lb-lab">Rainfall-only trigger</span><span class="lb-bar rain" style="width:100%"><span>7 places · 0.007 ETH</span></span><span class="lb-note">Would have fired everywhere. No “did not flood” labels, so no false-alarm count.</span></li>
+    <li><span class="lb-lab">This rule · radar and rainfall</span><span class="lb-bar radar" style="width:14.3%"><span>1 place · 0.001 ETH</span></span><span class="lb-note">The modeled loss. On the testnet as one claim.</span></li>
+  </ol>
+  <p class="note">Live claim state is read from Sepolia. <span class="live" data-live-zone="kabonyo-kanyagwal"><span class="snap">Reading…</span></span></p>
+  <p class="cta"><a class="btn" href="claim-kabonyo-kanyagwal.html">Open the modeled claim</a></p>
+</div></section>
+
+<section class="block alt" id="unmodeled"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>Unmodeled residual</h2>
+  <p>In a cat model this is the layer the catalogue missed. Here it is the 6 reported floods the rule did not open. We do not turn that into a return period.</p></div>
+  <div class="matrix-wrap"><div>
+  <table class="grants"><caption>Reported floods the rule left unmodeled, 0.006 ETH of demo exposure</caption>
+    <thead><tr><th scope="col">Place</th><th scope="col">Why it stayed out</th><th class="n" scope="col">Demo exposure</th></tr></thead>
+    <tbody><tr><th scope='row'>Kobura</th><td>Radar saw 0.9% open water, below 5.0%.</td><td class='n'>0.001 ETH</td></tr><tr><th scope='row'>Ahero</th><td>Radar saw 0.7% open water, below 5.0%.</td><td class='n'>0.001 ETH</td></tr><tr><th scope='row'>Ombeyi</th><td>Radar saw 0.3% open water, below 5.0%.</td><td class='n'>0.001 ETH</td></tr><tr><th scope='row'>Kakola Ombaka</th><td>No outline we would stand behind. Radar was not run.</td><td class='n'>0.001 ETH</td></tr><tr><th scope='row'>Nyamasao</th><td>No outline we would stand behind. Radar was not run.</td><td class='n'>0.001 ETH</td></tr><tr><th scope='row'>Kadibo</th><td>No outline we would stand behind. Radar was not run.</td><td class='n'>0.001 ETH</td></tr></tbody>
+  </table></div></div>
+  <p class="note">Radar sees open water. Flooding under crops, trees or buildings is invisible to it. A ward box mixes dry and wet land and pulls the fraction down. Three names had no outline we would measure rather than guess.</p>
+</div></section>
+
+<section class="block" id="not-a-model"><div class="wrap">
+  <div class="sec-head"><span class="num">05</span><h2>What a catastrophe model still has to do</h2>
+  <p>This page is the event you would feed the model. It is not the model.</p></div>
+  <ul class="limits">
+    <li><b>No stochastic catalogue.</b><span>One week. No average annual loss, no occurrence or aggregate exceedance curve, no probable maximum loss, no return period.</span></li>
+    <li><b>No vulnerability function.</b><span>We do not convert open-water fraction into damage. The payout is a binary grant.</span></li>
+    <li><b>No real exposure file.</b><span>0.001 ETH per place is a demo so the escrow can move. Load your own sums insured.</span></li>
+    <li><b>News is not ground-up loss.</b><span>The seven names are places reporters reached. Unknown is not “no flood”.</span></li>
+  </ul>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
