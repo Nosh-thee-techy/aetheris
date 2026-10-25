@@ -1,0 +1,8 @@
+.env
+.env.*
+**/node_modules
+**/__pycache__
+**/*.pyc
+.venv
+contracts/tools/build
+contracts/tools/node_modules

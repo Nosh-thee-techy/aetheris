@@ -1,0 +1,10 @@
+{
+  "name": "aetheris",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "npm run build --prefix app && python web/prepare_spa.py"
+  }
+}
