@@ -3,9 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Workspaces · Aetheris</title>
-<meta name="description" content="A workspace for each person who uses flood triggers: insurer, reinsurer, responder, data producer, researcher, and a plain view for a farmer.">
+<title>Desks · Aetheris</title>
+<meta name="description" content="A dashboard for each person who uses flood triggers: insurer, reinsurer, responder, data producer, researcher, and a plain view for a farmer.">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 </head>
 <body data-page="workspace">
 <a class="skip" href="#main">Skip to the content</a>
@@ -13,47 +29,69 @@
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
-  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Home</a><a href="login.html">Enter</a><a href="overview.html">Method</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
-<section class="page-head"><div class="wrap">
-  <p class="eyebrow">Workspaces · one job each</p>
-  <h1>A tool for the person who actually uses it</h1>
-  <p class="lede">The claims list is for the trigger analyst. Everyone else was getting a paragraph. Each workspace below is built from the same seven places and the same frozen rule. None of them invents a reading we did not take.</p>
+<div class="ribbon" aria-hidden="true"><img src="media/hero-basin.jpg" alt=""><p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p></div><section class="page-head"><div class="wrap">
+  <p class="eyebrow">Desks · one job each</p>
+  <h1>Open the dashboard that matches your job</h1>
+  <p class="lede">You entered through the desk gate. Each dashboard below is built from the same seven places and the same frozen rule. None of them invents a reading we did not take, and none of them is a machine-learning score.</p>
 </div></section>
 <section class="block tight"><div class="wrap">
   <div class="ws-grid"><a class="ws-card" href="for-insurer.html">
+    <img src="media/strip-rain.jpg" alt="">
+    <div class="ws-body">
     <span class="who-tag">Trigger analyst</span>
     <h3>Insurer or aggregator</h3>
     <p>See what rainfall-only would have paid, what this rule paid, and challenge the live claim.</p>
     <p class="ws-meta">7 rainfall-only · 1 opened</p>
+    </div>
   </a><a class="ws-card" href="for-reinsurer.html">
+    <img src="media/strip-water.jpg" alt="">
+    <div class="ws-body">
     <span class="who-tag">Event loss</span>
     <h3>Reinsurer</h3>
     <p>A layered footprint of one named flood: hazard, stand-in TIV, JRC-adapted damage, parametric grant.</p>
     <p class="ws-meta">0.001 ETH modeled · 0.006 ETH unmodeled</p>
+    </div>
   </a><a class="ws-card" href="for-responder.html">
+    <img src="media/hero-basin.jpg" alt="">
+    <div class="ws-body">
     <span class="who-tag">Second signal</span>
     <h3>Disaster responder</h3>
     <p>Act where radar also signed. Hold where only rainfall signed. Do not invent a reading where we could not look.</p>
     <p class="ws-meta">1 with a second signal · 3 rainfall only · 3 cannot assess</p>
+    </div>
   </a><a class="ws-card" href="for-data.html">
-    <span class="who-tag">Source reliability</span>
+    <img src="media/enter-radar.jpg" alt="">
+    <div class="ws-body">
+    <span class="who-tag">Source desk</span>
     <h3>ICPAC, Kenya Met</h3>
-    <p>Which product signed, which abstained, and the files to compare against your own.</p>
+    <p>A connected check on CHIRPS and Sentinel-1, served from the same files the rest of the site uses.</p>
     <p class="ws-meta">Radar assessed 4 of 7</p>
+    </div>
   </a><a class="ws-card" href="for-research.html">
+    <img src="media/strip-water.jpg" alt="">
+    <div class="ws-body">
     <span class="who-tag">Open method</span>
     <h3>Researcher or modeller</h3>
     <p>Counts, the frozen rule, downloads, and the commands that rebuild them.</p>
     <p class="ws-meta">Counts only. No accuracy figure.</p>
+    </div>
   </a><a class="ws-card" href="for-farmer.html">
+    <img src="media/desk-field.jpg" alt="">
+    <div class="ws-body">
     <span class="who-tag">Plain view</span>
     <h3>Smallholder or pastoralist</h3>
     <p>What the rule said about a place, in one sentence. An insurer or responder can show this page.</p>
     <p class="ws-meta">No wallet. No money moves.</p>
+    </div>
   </a></div>
   <p class="note">We have not interviewed these users. The reinsurer page is shaped like a catastrophe-model event, because that is how they already read a flood. It is still one week.</p>
 </div></section>
@@ -75,8 +113,10 @@
   <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+
 </body>
 </html>

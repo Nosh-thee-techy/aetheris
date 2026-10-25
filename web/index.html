@@ -4,125 +4,144 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Aetheris: a verification layer for flood data in Kenya</title>
-<meta name="description" content="Aetheris cross-checks satellite rainfall against Sentinel-1 radar, place by place and week by week, and records the result on a testnet where anyone can check or challenge it.">
+<meta name="description" content="Check satellite rainfall against Sentinel-1 radar for a named place and week. No machine learning. Enter a desk to open a dashboard.">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 </head>
-<body data-page="overview">
+<body data-page="home" class="skin-door">
 <a class="skip" href="#main">Skip to the content</a>
 <div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
-  <nav class="nav" aria-label="Pages"><a href="index.html" aria-current="page">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <nav class="nav" aria-label="Pages"><a href="index.html" aria-current="page">Home</a><a href="login.html">Enter</a><a href="overview.html">Method</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
-<section class="hero" id="top"><div class="wrap">
-  <p class="eyebrow">Verification layer · flood data · Kenya</p>
-  <h1>Rain data said “flood” in seven places. <em>Radar could confirm one.</em></h1>
-  <p class="lede">Flood payouts and alerts rest on satellite rainfall estimates that are sparse on the ground and often wrong in heavy rain.
-  <strong>Aetheris checks them against Sentinel-1 radar</strong>, which sees whether land is actually under water, for each place and week,
-  and records the result where anyone can check it or challenge it. This is the first week we checked: the Nyando basin, 4–6 May 2024.</p>
-  <p class="cta"><a class="btn primary" href="workspaces.html">Open a workspace</a> <a class="btn" href="claims.html">See the claims</a> <a class="btn" href="claim-kabonyo-kanyagwal.html">Open the one live claim</a> <a class="btn" href="backtest.html">Read the backtest</a></p>
-  <div class="facts">
-    <div class="fact"><span class="n">7</span><span class="k">places that news reports said flooded</span></div>
-    <div class="fact"><span class="n rain">7</span><span class="k">where rainfall data signed “flood”</span></div>
-    <div class="fact"><span class="n radar">1</span><span class="k">where radar also signed, so a claim opened. 3 radar said no; 3 could not be assessed.</span></div>
+<section class="hero-split" id="top">
+  <div class="hero-photo">
+    <img src="media/hero-basin.jpg" alt="">
+    <p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p>
   </div>
-</div></section>
+  <div class="hero-copy">
+    <p class="eyebrow">Verification layer · flood data · Kenya</p>
+    <h1>See which flood data signed.</h1>
+    <p class="lede">Aetheris checks satellite rainfall against Sentinel-1 radar for a named place and week, then records the result where anyone can check it or challenge it. No machine learning. One frozen rule. One named week: the Nyando basin, 4–6 May 2024.</p>
+    <p class="cta"><a class="btn primary" href="login.html" data-enter>Enter the desks</a> <a class="btn" href="overview.html">Read the method</a></p>
+  </div>
+</section>
 
-<section class="block" id="why"><div class="wrap">
-  <div class="sec-head"><span class="num">01</span><h2>When the data misses the flood, nobody can see why</h2>
-  <p>Smallholder farmers and pastoralists in flood-prone basins are paid by weather-index insurance, or helped by alerts, only when the data says a flood happened.
-  When that data misses their flood they get nothing, and the decision was made by a single operator, from an estimate, with no reason attached.</p></div>
-  <p class="note">Aetheris attaches the reason. Each decision shows what each source measured, against which line, and who signed. It also counts how often the
-  data misses real floods, so triggers can be designed more fairly over time. Today the benefit to farmers is indirect, and every payout in this demo is on a testnet or a sandbox.</p>
-  <h3 class="h-small gap-l">What the research says</h3>
-  <ul class="sources">
-    <li><b>Ground stations are few.</b> Africa’s average density of stations meeting WMO standards is eight times below the recommended level, and as of October 2024 Chad was reporting 3% of the surface observations it is required to. <a href="https://eos.org/features/building-better-weather-networks">Eos</a></li>
-    <li><b>Satellite rainfall is imperfect where it matters.</b> Against 596 TAHMO gauges, every product tested overestimated light rain and underestimated heavy rain (<a href="https://doi.org/10.1002/essoar.10509210.1">preprint</a>). In East Africa, CHIRPS had a 28% wet bias in daily rainfall (<a href="https://doi.org/10.1175/jhm-d-21-0161.1">published version</a>). Another study found CHIRPS missed 98% of the daily extreme-rain events its gauges recorded (<a href="https://doi.org/10.1175/jhm-d-21-0145.1">36 stations</a>). The studies differ on how good CHIRPS is, so read the numbers with care.</li>
-    <li><b>Ground data is gated.</b> ICPAC receives station data from national met services under bilateral agreements, and each service sets its own terms, some with cost recovery. <a href="https://www.icpac.net/events/regional-data-managers-biannual-meeting-on-climate-data-sharing-framework/">ICPAC</a></li>
-    <li><b>Index insurance already runs in Kenya on satellite triggers.</b> In 2021 Etherisc and ACRE Africa onboarded more than 17,000 smallholders and began paying some through M-Pesa. <a href="https://blog.etherisc.com/etherisc-update-etherisc-and-acre-africa-announce-first-payouts-through-blockchain-based-platform-a0c5194214f4">Etherisc</a> Those sources do not measure how often such triggers miss a real flood. That is what this project counts.</li>
+<section class="block" id="week"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>This week, in the files</h2>
+  <p>Seven places that news named as flooded. Counts only. Not an accuracy figure.</p></div>
+  <ul class="stat-cards">
+    <li>
+      <img src="media/desk-field.jpg" alt="">
+      <div>
+        <p class="n">7</p>
+        <h3>Named places</h3>
+        <p>The label log is news and situation reports, not a survey we ran. Reports favour places reporters could reach.</p>
+      </div>
+    </li>
+    <li>
+      <img src="media/strip-rain.jpg" alt="">
+      <div>
+        <p class="n rain">56.7<span class="unit"> mm</span></p>
+        <h3>CHIRPS signed 7 of 7</h3>
+        <p>One upstream catchment reading, applied everywhere. A millimetre total here is not a gauge total. Rainfall alone never opens a claim.</p>
+      </div>
+    </li>
+    <li>
+      <img src="media/strip-water.jpg" alt="">
+      <div>
+        <p class="n radar">1</p>
+        <h3>Radar also signed</h3>
+        <p>Assessed 4. Below the line 3. No outline we would measure: 3. Unknown is not “no flood”.</p>
+      </div>
+    </li>
   </ul>
-  <div class="rule-line"><p><b>What is new here, and what is not.</b> We found no published open-code method that cross-validates gauge readings against satellite products. We did not search specifically for radar-versus-rainfall cross-checks, which may exist in the flood-mapping literature, so we do not claim the cross-check itself is new. What we add is recording each disagreement as a signed, challengeable public claim tied to a payout rule.</p></div>
-</div></section>
-
-<section class="block alt" id="how"><div class="wrap">
-  <div class="sec-head"><span class="num">02</span><h2>A flood is accepted only when radar and a second source both sign</h2>
-  <p>Each place and week is one claim. Signing means “this payout rule fired”, not “I saw something”. Silence counts as no.</p></div>
-  <ol class="steps">
-    <li><span class="who radar">Radar</span><h3>Radar signs</h3><p>Sentinel-1 shows open water on enough of the place’s land, with permanent water removed. Required. Without it nothing opens.</p></li>
-    <li><span class="who rain">Rainfall</span><h3>A second source signs</h3><p>Rain over the upstream catchment crosses the line. Rainfall alone can never open a claim. Each signer posts a 0.01 ETH bond and its own evidence hash.</p></li>
-    <li><span class="who ink">Anyone</span><h3>Anyone can challenge</h3><p>For 24 hours, anyone can stake 0.01 ETH against the claim. A challenge freezes it. The referee can only uphold or reject.</p></li>
-    <li><span class="who ink">Contract</span><h3>It finalizes</h3><p>If no one challenged, or the referee stayed silent for 48 hours, the claim stands. Bonds come back. A rejected claim slashes the bonds to the challenger.</p></li>
-    <li><span class="who ink">Escrow</span><h3>It pays once</h3><p>Only a finalized claim releases funds, only to beneficiaries committed before the season, and each place-week-rule can be paid at most once.</p></li>
-  </ol>
-  <div class="rule-line"><p><b>The rule is frozen.</b> Radar line: open water below -16 dB on at least 5.0% of land pixels. Rainfall line: 40 mm over three days on the upstream catchment, lag 0 days. Fixed on 2026-10-12, before this week was scored, and hashed into every claim id. These are untuned starting values, not fitted to this flood. <a href="backtest.html#check">Check the hash against the contract.</a></p></div>
-</div></section>
-
-<section class="block" id="users"><div class="wrap">
-  <div class="sec-head"><span class="num">03</span><h2>Who this is for, and how we know</h2>
-  <p>The direct user is the <b>trigger analyst at an insurer or aggregator</b>: the person who decides what counts as a flood, owns the basis-risk problem, and can use a disagreement record. The people most affected, smallholders and pastoralists, are the beneficiaries, not the users. Data producers and researchers are the community we hope to help, not customers.</p></div>
-  <span class="flag">We have not interviewed anyone. The last column says which rows rest on research and which are our assumption.</span>
-  <table class="stakeholders">
-    <caption>Stakeholders, what each gains, and the basis for saying so</caption>
-    <thead><tr><th scope="col">Who</th><th scope="col">Problem they face</th><th scope="col">What Aetheris gives them</th><th scope="col">Basis</th></tr></thead>
-    <tbody>
-      <tr class="primary"><th scope="row">Insurers and aggregators <span class="tag">Direct user</span></th>
-        <td>Triggers can miss real floods or fire without loss (basis risk), and each dispute is costly to settle.</td>
-        <td>A trigger-design board: what rainfall-only would pay, what this rule pays, and the live claim. <a href="for-insurer.html">Insurer workspace →</a></td>
-        <td><b>Researched in part.</b> Satellite-triggered index insurance runs in Kenya at scale. That triggers miss floods is our reading of the field; no source above measures it.</td></tr>
-      <tr><th scope="row">Reinsurers</th>
-        <td>They price and hold catastrophe risk, and need a transparent event footprint they can put in their own model.</td>
-        <td>One named event, layered as hazard, exposure, modeled loss and unmodeled residual. Not a stochastic cat model. <a href="for-reinsurer.html">Event loss →</a></td>
-        <td><b>Assumption.</b> Shaped like a cat-model event because that is how they already read a flood. We have not interviewed a reinsurer.</td></tr>
-      <tr><th scope="row">Disaster responders <span class="note-s">County teams, Red Cross, agencies</span></th>
-        <td>Releasing funds or alerts on one forecast or one report is risky and hard to defend.</td>
-        <td>An action board: second signal, rainfall only, cannot assess. <a href="for-responder.html">Responder workspace →</a></td>
-        <td><b>Assumption.</b> Not researched.</td></tr>
-      <tr><th scope="row">Data producers <span class="note-s">ICPAC, Kenya Met</span></th>
-        <td>Gauges are sparse, station data is gated, and users cannot tell which satellite product to trust.</td>
-        <td>A reliability check on CHIRPS and Sentinel-1, with files and a hash. <a href="for-data.html">Data workspace →</a></td>
-        <td><b>Researched.</b> Station sparsity, data-sharing terms and rainfall bias are cited above.</td></tr>
-      <tr><th scope="row">Researchers and modellers</th>
-        <td>Validation studies contradict each other, and gauge data is hard to get.</td>
-        <td>The open method, the counts, and the commands that rebuild them. <a href="for-research.html">Research workspace →</a></td>
-        <td><b>Researched.</b> The CHIRPS studies cited above disagree.</td></tr>
-      <tr><th scope="row">Smallholders and pastoralists <span class="note-s">Most affected. Many use feature phones.</span></th>
-        <td>Unpaid when the index misses their flood, with no visible reason.</td>
-        <td>A plain-language page an insurer or responder can show them. <a href="for-farmer.html">Farmer view →</a></td>
-        <td><b>Assumption</b>, inferred from the basis-risk research.</td></tr>
-    </tbody>
-  </table>
-  <p class="note"><b>Next step to turn assumptions into evidence:</b> ask one insurer or aggregator whether a disagreement record like this would change how they set triggers. Until that answer exists, treat the rows marked “Assumption” as ours.</p>
+  <p class="note">The one place both sources signed is Kabonyo Kanyagwal. That is the live claim on Sepolia.</p>
 </div></section>
 
 <section class="block alt" id="built"><div class="wrap">
-  <div class="sec-head"><span class="num">04</span><h2>How it is built, and how much of it exists</h2>
-  <p>Data goes in on the left and a payout rule sits on the right. Each part says what state it is really in.</p></div>
-  <ol class="pipeline">
-    <li><h3>Sources</h3><p>Sentinel-1 radar (RTC), CHIRPS rainfall, JRC permanent water.</p><span class="state part">Read by hand for one week</span></li>
-    <li><h3>Frozen rule</h3><p><code>config/rule.yaml</code>. Its hash is part of every claim id.</p><span class="state done">Frozen, hash on the testnet</span></li>
-    <li><h3>Attester jobs</h3><p>Radar and rainfall jobs decide sign or stay silent from the rule. Each signs with its own key and bond.</p><span class="state part">Decisions written. The demo claim was submitted by the deploy script with the same keys</span></li>
-    <li><h3>FloodTrigger</h3><p>Holds claims, bonds, the challenge window and the referee’s only two choices.</p><span class="state done">Deployed on Sepolia. Unaudited</span></li>
-    <li><h3>PayoutEscrow</h3><p>Pays a finalized claim once to a table committed in advance.</p><span class="state done">Deployed on Sepolia. Beneficiaries are placeholders</span></li>
-    <li><h3>M-PESA mirror</h3><p>Copies a release into a record labelled SANDBOX.</p><span class="state part">A function that writes a record. No Daraja call is made</span></li>
-  </ol>
-  <p class="note">Not built: a committee or vote for the referee (one named key decides today), a ground-gauge attester, IMERG rainfall, and any check that real people want this.</p>
+  <div class="sec-head"><span class="num">02</span><h2>What we have built</h2>
+  <p>A check you can open, not a score you are asked to trust.</p></div>
+  <div class="story">
+    <div class="story-photo"><img src="media/enter-radar.jpg" alt=""><p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p></div>
+    <div>
+      <h3>Two sources, one frozen rule</h3>
+      <p>Radar is mandatory. Rainfall corroborates. The rule in <code>config/rule.yaml</code> was frozen before this week was scored. Its hash is on the contract. If the bytes change, the hash will not match.</p>
+      <h3>A claim you can challenge</h3>
+      <p>When both sources sign, a 24-hour window opens on Sepolia. Anyone with a wallet can challenge. One named referee key can uphold or reject. Payouts are testnet ETH in an escrow, once, after Finalized. M-PESA in this project is a labelled sandbox.</p>
+      <h3>A desk for each job</h3>
+      <p>The insurer sees rainfall-only versus this rule. The reinsurer sees one named event layered like a catastrophe model, with an indicative JRC depth-damage sheet labelled adapted or assumption. Responders get a second-signal board. ICPAC and Kenya Met get a connected source desk from the same files. Research gets the counts and the commands. Farmers get one sentence. None of this is machine learning.</p>
+    </div>
+  </div>
 </div></section>
 
-<section class="block" id="limits"><div class="wrap">
-  <div class="sec-head"><span class="num">05</span><h2>What we are not claiming</h2>
-  <p>This is not ground-truth validation, and it does not fix flood insurance.</p></div>
+<section class="block" id="desks"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Who each dashboard is for</h2>
+  <p>Enter as that person. We open that desk. Demo access, no password.</p></div>
+  <div class="ws-grid">
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-rain.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Trigger analyst</span><h3>Insurer</h3><p>Rainfall would have paid 7. This rule paid 1. That gap is the basis-risk record.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-water.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Event loss</span><h3>Reinsurer</h3><p>Hazard, stand-in TIV, JRC-adapted damage, parametric grant. One event, not a stochastic catalogue.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/hero-basin.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Second signal</span><h3>Responder</h3><p>Act where radar also signed. Hold where only rainfall signed. Do not invent a reading where we could not look.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/enter-radar.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">ICPAC / Kenya Met</span><h3>Data desk</h3><p>CHIRPS versus Sentinel-1 from <code>/api/desk</code>. Pixel counts and geometry, not a loss number.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-water.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Open method</span><h3>Research</h3><p>Agreement table, frozen rule, downloads. Repeat the count. Do not take the page on trust.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/desk-field.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Plain language</span><h3>Farmer view</h3><p>What the rule said about a place, in one sentence. No wallet. No money moves from that page.</p></div>
+    </a>
+  </div>
+</div></section>
+
+<section class="block alt" id="limits"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>What this is not</h2>
+  <p>Say the limits in the same breath as the work.</p></div>
   <ul class="limits">
-    <li><b>Radar has blind spots.</b><span>It sees open water. It does not see flood under crops, trees or buildings, and Sentinel-1’s 2024 revisit is twelve days, so a flood can rise and fall between passes.</span></li>
-    <li><b>The sources overlap.</b><span>Rainfall and radar describe the same storm. Two signatures are not two independent witnesses, and the agreement table is how we show how much they add.</span></li>
-    <li><b>Satellite rainfall is an estimate.</b><span>CHIRPS tends to overestimate light rain and underestimate heavy rain. Gauges are scarce here. IMERG is not connected.</span></li>
-    <li><b>The referee is one key.</b><span>In this demo a single named key can uphold or reject a challenge. A committee, then a vote, is the intended path. The contract has one function for it, so swapping does not change the rest.</span></li>
-    <li><b>One season, seven news reports.</b><span>Counts here are indicative. Reports favour places that reporters and rescuers could reach. There are no “did not flood” labels yet.</span></li>
-    <li><b>Payouts are not real.</b><span>The escrow holds testnet ETH. M-PESA is a Daraja sandbox mirror that moves no money. The contracts are unaudited.</span></li>
+    <li><b>Not machine learning.</b><span>A frozen prior on open water and a catchment rainfall line. We did not train on this week.</span></li>
+    <li><b>Not an accuracy percentage.</b><span>Seven news reports cannot carry one. We publish counts.</span></li>
+    <li><b>Not a catastrophe model.</b><span>The reinsurer page is one named flood. No AAL, EP curve, or return period.</span></li>
+    <li><b>Pictures are not evidence.</b><span>The photographs are decorative. They are not the 6 May Sentinel-1 scene and not a flood outline.</span></li>
+    <li><b>Unknown is not “no flood”.</b><span>Three places have no outline we would measure. Radar was not run there.</span></li>
+    <li><b>Payouts are not real.</b><span>Testnet ETH. M-PESA is a sandbox. The contracts are unaudited.</span></li>
   </ul>
+  <p class="cta"><a class="btn primary" href="login.html" data-enter>Enter the desks</a> <a class="btn" href="overview.html">Read the full method</a></p>
 </div></section>
 </main>
 
@@ -142,8 +161,10 @@
   <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+
 </body>
 </html>

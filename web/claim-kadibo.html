@@ -6,6 +6,22 @@
 <title>Kadibo · Aetheris</title>
 <meta name="description" content="What radar and rainfall each said about Kadibo for 4–6 May 2024, why the place was counted as flooded, and the live state of its claim on Sepolia.">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 </head>
 <body data-page="claim" data-zone="kadibo">
 <a class="skip" href="#main">Skip to the content</a>
@@ -13,8 +29,12 @@
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
-  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html" aria-current="page">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Home</a><a href="login.html">Enter</a><a href="overview.html">Method</a><a href="claims.html" aria-current="page">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
@@ -97,8 +117,10 @@
   <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+
 </body>
 </html>

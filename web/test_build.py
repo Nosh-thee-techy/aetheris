@@ -33,6 +33,31 @@ class SiteTests(unittest.TestCase):
         for slug in build.PLACES:
             self.assertIn(f"claim-{slug}.html", self.pages)
 
+    def test_door_is_landing_then_login_then_desks(self) -> None:
+        home = self.pages["index.html"]
+        login = self.pages["login.html"]
+        method = self.pages["overview.html"]
+        self.assertIn("Enter the desks", home)
+        self.assertIn("No machine learning", home)
+        self.assertIn("login.html", home)
+        self.assertIn("media/hero-basin.jpg", home)
+        self.assertIn("Decorative picture", home)
+        self.assertIn("hero-split", home)
+        self.assertIn('id="built"', home)
+        self.assertIn('id="desks"', home)
+        self.assertIn("What we have built", home)
+        self.assertIn("data-theme", home)
+        self.assertIn("Dark mode", home)
+        self.assertIn("media/enter-radar.jpg", login)
+        self.assertIn("There is no password", login)
+        self.assertNotIn('type="password"', login)
+        self.assertIn('name="role"', login)
+        self.assertIn("session.js", home)
+        self.assertIn("session.js", login)
+        self.assertIn("Radar could confirm", method)
+        self.assertIn("login.html", self.pages)
+        self.assertIn("overview.html", self.pages)
+
     def test_every_workspace_exists(self) -> None:
         for name in (
             "workspaces.html",
@@ -67,6 +92,19 @@ class SiteTests(unittest.TestCase):
         self.assertIn('id="pick"', html)
         self.assertIn("Rainfall trigger", html)
         self.assertIn("Would have paid", html)
+        for slug in build.PLACES:
+            self.assertIn(f'data-sheet="{slug}"', html)
+
+    def test_data_desk_is_connected_and_navy(self) -> None:
+        html = self.pages["for-data.html"]
+        self.assertIn('class="skin-data"', html)
+        self.assertIn("data-dash.js", html)
+        self.assertIn("data-api-desk", html)
+        self.assertIn("/api/desk", html)
+        self.assertIn('id="pick"', html)
+        self.assertIn('id="check"', html)
+        self.assertIn("Land pixels", html)
+        self.assertNotIn("render_misses", html)
         for slug in build.PLACES:
             self.assertIn(f'data-sheet="{slug}"', html)
 
@@ -126,10 +164,19 @@ class SiteTests(unittest.TestCase):
 
     def test_live_script_holds_no_keys_and_loads_nothing_remote(self) -> None:
         js = (WEB / "app.js").read_text(encoding="utf-8")
+        desk = (WEB / "data-dash.js").read_text(encoding="utf-8")
+        session = (WEB / "session.js").read_text(encoding="utf-8")
         self.assertNotRegex(js, r"0x[0-9a-fA-F]{64}")  # no hard-coded key or hash
+        self.assertNotRegex(desk, r"0x[0-9a-fA-F]{64}")
+        self.assertNotRegex(session, r"0x[0-9a-fA-F]{64}")
+        self.assertIn("/api/desk", desk)
+        self.assertIn("/api/session", session)
         for name, html in self.pages.items():
             for src in re.findall(r'<script[^>]+src="([^"]+)"', html):
                 self.assertFalse(src.startswith("http"), f"{name} loads {src} from the network")
+            for src in re.findall(r'<img[^>]+src="([^"]+)"', html):
+                self.assertFalse(src.startswith("http"), f"{name} loads image {src} from the network")
+                self.assertTrue((WEB / src).exists(), f"{name} missing {src}")
 
 
 if __name__ == "__main__":

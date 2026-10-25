@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enter a desk · Aetheris</title>
+<meta name="description" content="Demo access to the Aetheris desks. Pick who you are. There is no password and no machine learning.">
+<link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
+</head>
+<body data-page="login" class="skin-door">
+<a class="skip" href="#main">Skip to the content</a>
+<div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
+
+<header class="mast"><div class="wrap">
+  <a class="mark" href="index.html">Aether<span>is</span></a>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Home</a><a href="login.html" aria-current="page">Enter</a><a href="overview.html">Method</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
+</div></header>
+
+<main id="main">
+<section class="split-enter">
+  <div class="split-photo">
+    <img src="media/enter-radar.jpg" alt="">
+    <p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p>
+  </div>
+  <div class="split-form">
+    <p class="eyebrow">Enter a desk</p>
+    <h1>Pick who you are. We open that dashboard.</h1>
+    <p class="lede">This is demo access. There is no password and we do not hold accounts. Nothing here is a machine-learning score.</p>
+    <form class="login" data-login>
+      <fieldset>
+        <legend>Who are you</legend>
+        <label class="desk-pick">
+      <input type="radio" name="role" value="icpac" required>
+      <span><b>ICPAC</b><span class="pick-why">Compare CHIRPS and Sentinel-1 on the week you already publish.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="kenya-met" required>
+      <span><b>Kenya Meteorological Department</b><span class="pick-why">The same source desk, labelled for Kenya Met.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="insurer" required>
+      <span><b>Insurer or aggregator</b><span class="pick-why">What a rainfall-only trigger would have paid, and what this rule paid.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="reinsurer" required>
+      <span><b>Reinsurer</b><span class="pick-why">One named event: hazard, exposure, indicative loss.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="responder" required>
+      <span><b>Disaster responder</b><span class="pick-why">Act where radar also signed. Hold where only rainfall signed.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="research" required>
+      <span><b>Researcher</b><span class="pick-why">Counts, the frozen rule, and the files to reproduce them.</span></span>
+    </label><label class="desk-pick">
+      <input type="radio" name="role" value="farmer" required>
+      <span><b>Farmer view</b><span class="pick-why">What the rule said about a place, in one sentence.</span></span>
+    </label>
+      </fieldset>
+      <label class="name-field">Your name <span class="opt">(optional)</span>
+        <input type="text" name="name" maxlength="80" autocomplete="name" placeholder="Shown on the desk">
+      </label>
+      <p class="cta"><button class="btn primary" type="submit">Open desk</button></p>
+      <p class="api-status wait" data-login-status hidden></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">
+  <div><h3>Check it yourself</h3><ul>
+    <li><a href="backtest.html#check">Hash the frozen rule against the contract</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/docs/agreement.md">Agreement table, with pixel counts</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/config/rule.yaml">The frozen rule</a></li>
+    <li><a href="https://github.com/Nosh-thee-techy/aetheris/blob/main/labels/label_log.csv">Label log and sources</a></li>
+  </ul></div>
+  <div><h3>Data</h3><ul>
+    <li>Sentinel-1 RTC via Microsoft Planetary Computer</li>
+    <li>CHIRPS 2.0 daily rainfall</li>
+    <li>JRC Global Surface Water</li>
+    <li>Place boundaries © OpenStreetMap contributors</li>
+  </ul></div>
+  <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
+</div></footer>
+
+<script src="session.js" defer></script>
+<script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
+<script src="chain-config.js" defer></script>
+<script src="app.js" defer></script>
+
+</body>
+</html>

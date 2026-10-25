@@ -42,7 +42,7 @@ WORKSPACES = [
 
 
 def workspace_nav(current: str) -> str:
-    parts = ['<nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a>']
+    parts = ['<nav class="ws-nav" aria-label="Desks"><a href="workspaces.html">All desks</a>']
     for href, label, key in WORKSPACES:
         current_attr = ' aria-current="page"' if current == key else ""
         parts.append(f'<a href="{href}"{current_attr}>{escape(label)}</a>')
@@ -166,6 +166,19 @@ def render_place_sheets(places: list[dict], build, deployment, flavor: str = "re
     <div><span class="k">On the testnet</span><b class="live" data-live-zone="{p['slug']}"><span class="snap">{escape(build.snapshot_text(p['slug'], deployment))}</span></b></div>
   </div>"""
             cta = f'<a class="btn" href="{p["page"]}">Open the claim page</a>'
+        if flavor == "data":
+            rain_word = "Signed" if p["rain"] == "yes" else "Did not sign"
+            geom = "Outline measured" if p["fraction"] is not None else "No outline"
+            land = f"{p['land']:,}" if p["land"] is not None else "—"
+            wet = f"{p['flooded']:,}" if p["flooded"] is not None else "—"
+            stats = f"""<div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>{rain_word}</b></div>
+    <div><span class="k">Sentinel-1</span><b>{escape(frac)}</b></div>
+    <div><span class="k">Land pixels</span><b>{land}</b></div>
+    <div><span class="k">Looked like water</span><b>{wet}</b></div>
+    <div><span class="k">Geometry</span><b>{geom}</b></div>
+  </div>"""
+            cta = f'<a class="btn" href="{p["page"]}">Open the evidence</a>'
         sheets.append(
             f"""<article class="place-sheet" data-sheet="{p['slug']}"{hidden}>
   <p class="who-tag">{escape(p['scale'])}</p>
@@ -193,7 +206,7 @@ def render_all(build, places, counts, deployment) -> dict[str, str]:
         "for-insurer.html": _wrap(build, "insurer", page_insurer(build, places, counts, deployment)),
         "for-reinsurer.html": _wrap(build, "reinsurer", page_reinsurer(build, places, counts, deployment)),
         "for-responder.html": _wrap(build, "responder", page_responder(build, places, deployment)),
-        "for-data.html": _wrap(build, "data", page_data(build, places, counts)),
+        "for-data.html": _wrap(build, "data", page_data(build, places, deployment)),
         "for-research.html": _wrap(build, "research", page_research(build, places, counts)),
         "for-farmer.html": _wrap(build, "farmer", page_farmer(build, places)),
     }
@@ -201,53 +214,75 @@ def render_all(build, places, counts, deployment) -> dict[str, str]:
 
 def _wrap(build, key: str, body: str) -> str:
     titles = {
-        "workspaces": ("Workspaces · Aetheris", "A workspace for each person who uses flood triggers: insurer, reinsurer, responder, data producer, researcher, and a plain view for a farmer."),
+        "workspaces": ("Desks · Aetheris", "A dashboard for each person who uses flood triggers: insurer, reinsurer, responder, data producer, researcher, and a plain view for a farmer."),
         "insurer": ("Insurer workspace · Aetheris", "What each trigger rule would have done in the Nyando basin in the week of 4–6 May 2024, and the one live claim you can challenge."),
         "reinsurer": ("Reinsurer workspace · event loss · Aetheris", "Hazard, exposure, modeled loss and the unmodeled residual for one named Nyando flood. One event, not a catastrophe model."),
         "responder": ("Responder workspace · Aetheris", "Which reported floods in Nyando, 4–6 May 2024, have a second signal from radar, which have rainfall only, and which could not be assessed."),
-        "data": ("Data workspace · Aetheris", "How CHIRPS and Sentinel-1 each behaved on the Nyando flood week, with downloads and a way to hash the frozen rule."),
+        "data": ("Data desk · ICPAC / Kenya Met · Aetheris", "A connected check on CHIRPS and Sentinel-1 for the Nyando flood week: the same files the local API serves, a place map, and a hash of the frozen rule."),
         "research": ("Research workspace · Aetheris", "The open method, the agreement table, and the files needed to reproduce the Nyando flood-week counts."),
         "farmer": ("Farmer view · Aetheris", "What the rule said about each place in the Nyando basin, 4–6 May 2024, in plain language. No money moves from this page."),
     }
     title, desc = titles[key]
-    return build.shell(title=title, desc=desc, key="workspaces", page="workspace", body=body)
+    extra = {}
+    if key == "data":
+        extra = {"skin": "skin-data", "scripts": ("data-dash.js",)}
+    photos = {
+        "workspaces": "media/hero-basin.jpg",
+        "insurer": "media/strip-rain.jpg",
+        "reinsurer": "media/strip-water.jpg",
+        "responder": "media/hero-basin.jpg",
+        "data": "media/enter-radar.jpg",
+        "research": "media/strip-water.jpg",
+        "farmer": "media/desk-field.jpg",
+    }
+    src = photos.get(key)
+    if src:
+        body = (
+            f'<div class="ribbon" aria-hidden="true"><img src="{src}" alt="">'
+            f'<p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p></div>'
+            + body
+        )
+    return build.shell(title=title, desc=desc, key="workspaces", page="workspace", body=body, **extra)
 
 
 def page_hub(build, places) -> str:
     g = groups(places)
     cards = [
-        ("for-insurer.html", "Insurer or aggregator", "Trigger analyst",
+        ("for-insurer.html", "media/strip-rain.jpg", "Insurer or aggregator", "Trigger analyst",
          "See what rainfall-only would have paid, what this rule paid, and challenge the live claim.",
          f"{len(g['rainfall'])} rainfall-only · {len(g['modeled'])} opened"),
-        ("for-reinsurer.html", "Reinsurer", "Event loss",
+        ("for-reinsurer.html", "media/strip-water.jpg", "Reinsurer", "Event loss",
          "A layered footprint of one named flood: hazard, stand-in TIV, JRC-adapted damage, parametric grant.",
          f"{grant_sum(len(g['modeled']))} ETH modeled · {grant_sum(len(g['radar_no']) + len(g['unassessed']))} ETH unmodeled"),
-        ("for-responder.html", "Disaster responder", "Second signal",
+        ("for-responder.html", "media/hero-basin.jpg", "Disaster responder", "Second signal",
          "Act where radar also signed. Hold where only rainfall signed. Do not invent a reading where we could not look.",
          f"{len(g['modeled'])} with a second signal · {len(g['radar_no'])} rainfall only · {len(g['unassessed'])} cannot assess"),
-        ("for-data.html", "ICPAC, Kenya Met", "Source reliability",
-         "Which product signed, which abstained, and the files to compare against your own.",
+        ("for-data.html", "media/enter-radar.jpg", "ICPAC, Kenya Met", "Source desk",
+         "A connected check on CHIRPS and Sentinel-1, served from the same files the rest of the site uses.",
          f"Radar assessed {len(g['modeled']) + len(g['radar_no'])} of {len(places)}"),
-        ("for-research.html", "Researcher or modeller", "Open method",
+        ("for-research.html", "media/strip-water.jpg", "Researcher or modeller", "Open method",
          "Counts, the frozen rule, downloads, and the commands that rebuild them.",
          "Counts only. No accuracy figure."),
-        ("for-farmer.html", "Smallholder or pastoralist", "Plain view",
+        ("for-farmer.html", "media/desk-field.jpg", "Smallholder or pastoralist", "Plain view",
          "What the rule said about a place, in one sentence. An insurer or responder can show this page.",
          "No wallet. No money moves."),
     ]
     items = "".join(
         f"""<a class="ws-card" href="{href}">
+    <img src="{photo}" alt="">
+    <div class="ws-body">
     <span class="who-tag">{escape(who)}</span>
     <h3>{escape(title)}</h3>
     <p>{escape(blurb)}</p>
     <p class="ws-meta">{escape(meta)}</p>
+    </div>
   </a>"""
-        for href, title, who, blurb, meta in cards
+        for href, photo, title, who, blurb, meta in cards
     )
     return f"""<section class="page-head"><div class="wrap">
-  <p class="eyebrow">Workspaces · one job each</p>
-  <h1>A tool for the person who actually uses it</h1>
-  <p class="lede">The claims list is for the trigger analyst. Everyone else was getting a paragraph. Each workspace below is built from the same seven places and the same frozen rule. None of them invents a reading we did not take.</p>
+  <p class="eyebrow">Desks · one job each</p>
+  <h1>Open the dashboard that matches your job</h1>
+  <p class="lede">You entered through the desk gate. Each dashboard below is built from the same seven places and the same frozen rule. None of them invents a reading we did not take, and none of them is a machine-learning score.</p>
 </div></section>
 <section class="block tight"><div class="wrap">
   <div class="ws-grid">{items}</div>
@@ -519,7 +554,28 @@ def page_responder(build, places, deployment) -> str:
 </div></section>"""
 
 
-def page_data(build, places, counts) -> str:
+def _place_rows(places: list[dict]) -> str:
+    rows = []
+    for p in places:
+        rain_word = "Signed" if p["rain"] == "yes" else "Did not sign"
+        if p["decision"] == "yes":
+            radar_word = "Signed"
+        elif p["decision"] == "no":
+            radar_word = "Below the line"
+        else:
+            radar_word = "Not measured"
+        land = f"{p['land']:,}" if p["land"] is not None else "—"
+        wet = f"{p['flooded']:,}" if p["flooded"] is not None else "—"
+        geom = "Outline" if p["fraction"] is not None else "No outline"
+        rows.append(
+            f"<tr><th scope='row'>{escape(p['name'])}</th>"
+            f"<td>{rain_word}</td><td>{radar_word}</td>"
+            f"<td>{land}</td><td>{wet}</td><td>{geom}</td></tr>"
+        )
+    return "".join(rows)
+
+
+def page_data(build, places, deployment) -> str:
     g = groups(places)
     n = len(places)
     assessed = len(g["modeled"]) + len(g["radar_no"])
@@ -535,34 +591,56 @@ def page_data(build, places, counts) -> str:
     )
     return f"""<section class="page-head"><div class="wrap">
   {workspace_nav("data")}
-  <p class="eyebrow">Data workspace · ICPAC, Kenya Met</p>
+  <p class="eyebrow">Data desk · ICPAC, Kenya Met</p>
   <h1>An open check on the products you already publish</h1>
-  <p class="lede">CHIRPS signed every place because it is one catchment reading. Sentinel-1 could look at {assessed} of {n} places. The rest had no outline we would measure. Compare this against your own stations or your own rainfall field.</p>
+  <p class="lede">CHIRPS signed every place because it is one catchment reading. Sentinel-1 could look at {assessed} of {n} places. The rest had no outline we would measure. The numbers on this page are filled from <code>/api/desk</code>, which reads the same repository files. Compare them against your own stations or your own rainfall field.</p>
+  <p class="api-status wait" data-api-status>Connecting to the local API…</p>
 </div></section>
 <section class="block"><div class="wrap">
-  <div class="sec-head"><span class="num">01</span><h2>How each source behaved</h2></div>
-  <div class="layers">
+  <div class="sec-head"><span class="num">01</span><h2>How each source behaved</h2>
+  <p>These cards start from the generator, then the local API overwrites them so you can see the wire is live.</p></div>
+  <div class="layers" data-api-desk>
     <div class="layer">
       <h3>CHIRPS 2.0 daily</h3>
-      <p class="n-lg">{rain_mm:.1f} mm</p>
-      <p>Signed {len(g['rainfall'])} of {n}. One upstream catchment, applied everywhere. A millimetre total here is not a gauge total.</p>
+      <p class="n-lg" data-api-rain-mm>{rain_mm:.1f} mm</p>
+      <p data-api-rain-signed>Signed {len(g['rainfall'])} of {n}. One upstream catchment, applied everywhere. A millimetre total here is not a gauge total.</p>
     </div>
     <div class="layer">
       <h3>Sentinel-1 RTC</h3>
-      <p class="n-lg">{assessed}/{n}</p>
-      <p>Assessed {assessed}. Signed {len(g['modeled'])}. Below the line {len(g['radar_no'])}. No geometry {len(g['unassessed'])}: {names(g['unassessed'])}.</p>
+      <p class="n-lg" data-api-radar-assessed>{assessed}/{n}</p>
+      <p data-api-radar-line>Assessed {assessed}. Signed {len(g['modeled'])}. Below the line {len(g['radar_no'])}. No geometry {len(g['unassessed'])}: {names(g['unassessed'])}.</p>
+    </div>
+    <div class="layer">
+      <h3>Frozen rule</h3>
+      <p class="n-lg" data-api-rule-name>{escape(build.RULE['rule_id'])}</p>
+      <p data-api-rule>Frozen {escape(str(build.RULE['frozen_on']))}. The hash on the chain is of this file, byte for byte.</p>
     </div>
   </div>
-  <div class="matrix-wrap gap-l">
-    <div>{build.render_matrix(places)}</div>
-    <div>{build.render_misses(counts)}</div>
-  </div>
+</div></section>
+<section class="block tight" id="pick"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Pick a place</h2>
+  <p>Click a box, or a name. The sheet is pixels and geometry, not a loss number.</p></div>
+  {render_place_picker(places, build, deployment, "data")}
 </div></section>
 <section class="block alt"><div class="wrap">
-  <div class="sec-head"><span class="num">02</span><h2>Take the files and the hash</h2>
-  <p>The rule on the chain is a hash of <code>config/rule.yaml</code>. If the bytes change, the hash will not match.</p></div>
+  <div class="sec-head"><span class="num">03</span><h2>Agreement, from the files</h2>
+  <p>Miss counts here are derived from the seven places, not from an empty miss table. Rainfall alone is not a flood, and unknown is not “no flood”.</p></div>
+  <div class="matrix-wrap">
+    <div>{build.render_matrix(places)}</div>
+  </div>
+  <table class="grants place-table" data-api-places>
+    <caption>What each source said, per place</caption>
+    <thead><tr><th scope="col">Place</th><th scope="col">CHIRPS</th><th scope="col">Sentinel-1</th><th scope="col">Land pixels</th><th scope="col">Looked like water</th><th scope="col">Geometry</th></tr></thead>
+    <tbody>{_place_rows(places)}</tbody>
+  </table>
+</div></section>
+<section class="block" id="check"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>Hash the frozen rule against the contract</h2>
+  <p>Each claim id contains a hash of <code>config/rule.yaml</code>. This button hashes the file here, in your browser, then asks the contract what hash it holds.</p></div>
+  <button class="btn primary" type="button" data-check-rule disabled>Hash the rule and compare</button>
+  <div data-check-out class="check-out" aria-live="polite"></div>
   <ul class="downloads">{downloads}</ul>
-  <p class="cta"><a class="btn primary" href="backtest.html#check">Hash the rule against the contract</a></p>
+  <p class="note">Open this desk through <code>python web/server.py</code> so the API can answer. Opening the HTML from disk cannot reach <code>/api/desk</code>.</p>
 </div></section>"""
 
 

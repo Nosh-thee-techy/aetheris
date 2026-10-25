@@ -3,42 +3,179 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data workspace · Aetheris</title>
-<meta name="description" content="How CHIRPS and Sentinel-1 each behaved on the Nyando flood week, with downloads and a way to hash the frozen rule.">
+<title>Data desk · ICPAC / Kenya Met · Aetheris</title>
+<meta name="description" content="A connected check on CHIRPS and Sentinel-1 for the Nyando flood week: the same files the local API serves, a place map, and a hash of the frozen rule.">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 </head>
-<body data-page="workspace">
+<body data-page="workspace" class="skin-data">
 <a class="skip" href="#main">Skip to the content</a>
 <div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
-  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Home</a><a href="login.html">Enter</a><a href="overview.html">Method</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
-<section class="page-head"><div class="wrap">
-  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html" aria-current="page">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
-  <p class="eyebrow">Data workspace · ICPAC, Kenya Met</p>
+<div class="ribbon" aria-hidden="true"><img src="media/enter-radar.jpg" alt=""><p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p></div><section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Desks"><a href="workspaces.html">All desks</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html" aria-current="page">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+  <p class="eyebrow">Data desk · ICPAC, Kenya Met</p>
   <h1>An open check on the products you already publish</h1>
-  <p class="lede">CHIRPS signed every place because it is one catchment reading. Sentinel-1 could look at 4 of 7 places. The rest had no outline we would measure. Compare this against your own stations or your own rainfall field.</p>
+  <p class="lede">CHIRPS signed every place because it is one catchment reading. Sentinel-1 could look at 4 of 7 places. The rest had no outline we would measure. The numbers on this page are filled from <code>/api/desk</code>, which reads the same repository files. Compare them against your own stations or your own rainfall field.</p>
+  <p class="api-status wait" data-api-status>Connecting to the local API…</p>
 </div></section>
 <section class="block"><div class="wrap">
-  <div class="sec-head"><span class="num">01</span><h2>How each source behaved</h2></div>
-  <div class="layers">
+  <div class="sec-head"><span class="num">01</span><h2>How each source behaved</h2>
+  <p>These cards start from the generator, then the local API overwrites them so you can see the wire is live.</p></div>
+  <div class="layers" data-api-desk>
     <div class="layer">
       <h3>CHIRPS 2.0 daily</h3>
-      <p class="n-lg">56.7 mm</p>
-      <p>Signed 7 of 7. One upstream catchment, applied everywhere. A millimetre total here is not a gauge total.</p>
+      <p class="n-lg" data-api-rain-mm>56.7 mm</p>
+      <p data-api-rain-signed>Signed 7 of 7. One upstream catchment, applied everywhere. A millimetre total here is not a gauge total.</p>
     </div>
     <div class="layer">
       <h3>Sentinel-1 RTC</h3>
-      <p class="n-lg">4/7</p>
-      <p>Assessed 4. Signed 1. Below the line 3. No geometry 3: Kakola Ombaka, Nyamasao, Kadibo.</p>
+      <p class="n-lg" data-api-radar-assessed>4/7</p>
+      <p data-api-radar-line>Assessed 4. Signed 1. Below the line 3. No geometry 3: Kakola Ombaka, Nyamasao, Kadibo.</p>
+    </div>
+    <div class="layer">
+      <h3>Frozen rule</h3>
+      <p class="n-lg" data-api-rule-name>nyando-open-water-v1</p>
+      <p data-api-rule>Frozen 2026-10-12. The hash on the chain is of this file, byte for byte.</p>
     </div>
   </div>
-  <div class="matrix-wrap gap-l">
+</div></section>
+<section class="block tight" id="pick"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>Pick a place</h2>
+  <p>Click a box, or a name. The sheet is pixels and geometry, not a loss number.</p></div>
+  <div class="map-split">
+    <div class="map-pane" data-place-map>
+  <svg class="basin" viewBox="0 0 640 520" role="img" aria-label="Working boxes for the four places that have an OpenStreetMap outline">
+    <g class="box signed" data-pick="kabonyo-kanyagwal" tabindex="0" role="button" aria-pressed="false" aria-label="Kabonyo Kanyagwal"><rect x="71.8" y="233.0" width="283.0" height="248.2"/><text x="213.3" y="357.1">Kabonyo</text></g><g class="box no" data-pick="ombeyi" tabindex="0" role="button" aria-pressed="false" aria-label="Ombeyi"><rect x="264.2" y="38.8" width="324.8" height="196.4"/><text x="426.6" y="137.0">Ombeyi</text></g><g class="box no" data-pick="kobura" tabindex="0" role="button" aria-pressed="false" aria-label="Kobura"><rect x="51.0" y="133.2" width="344.4" height="173.9"/><text x="223.2" y="220.2">Kobura</text></g><g class="box no" data-pick="ahero" tabindex="0" role="button" aria-pressed="false" aria-label="Ahero"><rect x="349.5" y="182.7" width="137.6" height="104.9"/><text x="418.3" y="303.6">Ahero</text></g>
+  </svg>
+  <p class="map-key"><span class="sw radar"></span>Radar signed <span class="sw line"></span>Radar did not sign. Boxes overlap because they are ward extents, not flood outlines.</p>
+  <div class="map-picks"><button type="button" class="map-pick" data-pick="kabonyo-kanyagwal" aria-pressed="false">Kabonyo Kanyagwal</button><button type="button" class="map-pick" data-pick="kobura" aria-pressed="false">Kobura</button><button type="button" class="map-pick" data-pick="ahero" aria-pressed="false">Ahero</button><button type="button" class="map-pick" data-pick="ombeyi" aria-pressed="false">Ombeyi</button></div>
+  <ul class="no-geom"><li class="head">Named, no outline</li><li><button type="button" data-pick="kakola-ombaka" aria-pressed="false">Kakola Ombaka</button><span>No outline. Not drawn.</span></li><li><button type="button" data-pick="nyamasao" aria-pressed="false">Nyamasao</button><span>No outline. Not drawn.</span></li><li><button type="button" data-pick="kadibo" aria-pressed="false">Kadibo</button><span>No outline. Not drawn.</span></li></ul>
+</div>
+    <div class="sheet-host"><article class="place-sheet" data-sheet="kabonyo-kanyagwal">
+  <p class="who-tag">Ward</p>
+  <h3>Kabonyo Kanyagwal</h3>
+  <p class="out"><span class="dot signed"></span>Claim opens</p>
+  <p>Both sources signed. A claim is on the testnet.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>8.9%</b></div>
+    <div><span class="k">Land pixels</span><b>1,589,424</b></div>
+    <div><span class="k">Looked like water</span><b>141,955</b></div>
+    <div><span class="k">Geometry</span><b>Outline measured</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-kabonyo-kanyagwal.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="kobura" hidden>
+  <p class="who-tag">Ward box; the report said village</p>
+  <h3>Kobura</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>0.9%</b></div>
+    <div><span class="k">Land pixels</span><b>1,448,140</b></div>
+    <div><span class="k">Looked like water</span><b>13,746</b></div>
+    <div><span class="k">Geometry</span><b>Outline measured</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-kobura.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="ahero" hidden>
+  <p class="who-tag">Town, 3 km box around the town point</p>
+  <h3>Ahero</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>0.7%</b></div>
+    <div><span class="k">Land pixels</span><b>358,797</b></div>
+    <div><span class="k">Looked like water</span><b>2,370</b></div>
+    <div><span class="k">Geometry</span><b>Outline measured</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-ahero.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="ombeyi" hidden>
+  <p class="who-tag">Location, measured on the ward box</p>
+  <h3>Ombeyi</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>0.3%</b></div>
+    <div><span class="k">Land pixels</span><b>1,586,442</b></div>
+    <div><span class="k">Looked like water</span><b>4,427</b></div>
+    <div><span class="k">Geometry</span><b>Outline measured</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-ombeyi.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="kakola-ombaka" hidden>
+  <p class="who-tag">Named area, no outline found</p>
+  <h3>Kakola Ombaka</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>Not measured</b></div>
+    <div><span class="k">Land pixels</span><b>—</b></div>
+    <div><span class="k">Looked like water</span><b>—</b></div>
+    <div><span class="k">Geometry</span><b>No outline</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-kakola-ombaka.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="nyamasao" hidden>
+  <p class="who-tag">Dispensary, no outline found</p>
+  <h3>Nyamasao</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>Not measured</b></div>
+    <div><span class="k">Land pixels</span><b>—</b></div>
+    <div><span class="k">Looked like water</span><b>—</b></div>
+    <div><span class="k">Geometry</span><b>No outline</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-nyamasao.html">Open the evidence</a></p>
+</article><article class="place-sheet" data-sheet="kadibo" hidden>
+  <p class="who-tag">Sub-county, no outline found</p>
+  <h3>Kadibo</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">CHIRPS</span><b>Signed</b></div>
+    <div><span class="k">Sentinel-1</span><b>Not measured</b></div>
+    <div><span class="k">Land pixels</span><b>—</b></div>
+    <div><span class="k">Looked like water</span><b>—</b></div>
+    <div><span class="k">Geometry</span><b>No outline</b></div>
+  </div>
+  <p class="cta"><a class="btn" href="claim-kadibo.html">Open the evidence</a></p>
+</article></div>
+  </div>
+</div></section>
+<section class="block alt"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Agreement, from the files</h2>
+  <p>Miss counts here are derived from the seven places, not from an empty miss table. Rainfall alone is not a flood, and unknown is not “no flood”.</p></div>
+  <div class="matrix-wrap">
     <div><table class="matrix">
   <caption>Radar (rows) against rainfall (columns), 7 places reported flooded</caption>
   <thead><tr><th></th><th scope="col">Rainfall signed</th><th scope="col">Rainfall did not sign</th></tr></thead>
@@ -48,18 +185,20 @@
     <tr><th scope="row">Radar not assessed</th><td><span class="big">3</span><small>Kakola Ombaka, Nyamasao, Kadibo</small></td><td class="zero n">0</td></tr>
   </tbody>
 </table></div>
-    <div><table>
-  <caption>Why the reported floods that produced no claim were missed</caption>
-  <thead><tr><th></th><th class="n">Places</th></tr></thead>
-  <tbody><tr><th scope="row">Radar had no pass that week</th><td class="n">0</td></tr><tr><th scope="row">Radar saw too little open water</th><td class="n">0</td></tr><tr><th scope="row">Radar signed, the second source did not</th><td class="n">0</td></tr><tr><th scope="row">Rainfall data was missing</th><td class="n">0</td></tr><tr><th scope="row">No outline to measure, radar not run</th><td class="n">0</td></tr></tbody>
-</table></div>
   </div>
+  <table class="grants place-table" data-api-places>
+    <caption>What each source said, per place</caption>
+    <thead><tr><th scope="col">Place</th><th scope="col">CHIRPS</th><th scope="col">Sentinel-1</th><th scope="col">Land pixels</th><th scope="col">Looked like water</th><th scope="col">Geometry</th></tr></thead>
+    <tbody><tr><th scope='row'>Kabonyo Kanyagwal</th><td>Signed</td><td>Signed</td><td>1,589,424</td><td>141,955</td><td>Outline</td></tr><tr><th scope='row'>Kobura</th><td>Signed</td><td>Below the line</td><td>1,448,140</td><td>13,746</td><td>Outline</td></tr><tr><th scope='row'>Ahero</th><td>Signed</td><td>Below the line</td><td>358,797</td><td>2,370</td><td>Outline</td></tr><tr><th scope='row'>Ombeyi</th><td>Signed</td><td>Below the line</td><td>1,586,442</td><td>4,427</td><td>Outline</td></tr><tr><th scope='row'>Kakola Ombaka</th><td>Signed</td><td>Not measured</td><td>—</td><td>—</td><td>No outline</td></tr><tr><th scope='row'>Nyamasao</th><td>Signed</td><td>Not measured</td><td>—</td><td>—</td><td>No outline</td></tr><tr><th scope='row'>Kadibo</th><td>Signed</td><td>Not measured</td><td>—</td><td>—</td><td>No outline</td></tr></tbody>
+  </table>
 </div></section>
-<section class="block alt"><div class="wrap">
-  <div class="sec-head"><span class="num">02</span><h2>Take the files and the hash</h2>
-  <p>The rule on the chain is a hash of <code>config/rule.yaml</code>. If the bytes change, the hash will not match.</p></div>
+<section class="block" id="check"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>Hash the frozen rule against the contract</h2>
+  <p>Each claim id contains a hash of <code>config/rule.yaml</code>. This button hashes the file here, in your browser, then asks the contract what hash it holds.</p></div>
+  <button class="btn primary" type="button" data-check-rule disabled>Hash the rule and compare</button>
+  <div data-check-out class="check-out" aria-live="polite"></div>
   <ul class="downloads"><li><a href="data/counts.csv" download>counts.csv</a><span>Every count on this site</span></li><li><a href="data/radar_fractions.csv" download>radar_fractions.csv</a><span>Radar fraction and pixel counts</span></li><li><a href="data/observations.csv" download>observations.csv</a><span>What each source signed</span></li><li><a href="data/rule.yaml" download>rule.yaml</a><span>The frozen rule, byte for byte</span></li></ul>
-  <p class="cta"><a class="btn primary" href="backtest.html#check">Hash the rule against the contract</a></p>
+  <p class="note">Open this desk through <code>python web/server.py</code> so the API can answer. Opening the HTML from disk cannot reach <code>/api/desk</code>.</p>
 </div></section>
 </main>
 
@@ -79,8 +218,11 @@
   <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+<script src="data-dash.js" defer></script>
+
 </body>
 </html>

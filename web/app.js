@@ -24,7 +24,8 @@
   var C = window.AETHERIS;
   var E = window.ethers;
   var body = document.body;
-  var page = body.getAttribute("data-page");
+  if (!body) return;
+  var page = body.getAttribute("data-page") || "";
 
   function $(sel, root) { return (root || document).querySelector(sel); }
   function $all(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
@@ -670,6 +671,7 @@
   function updateWalletUi() {
     var b = $("[data-wallet]");
     if (!b) return;
+    if (page === "home" || page === "login") { b.hidden = true; return; }
     b.hidden = false;
     if (!window.ethereum) { b.textContent = "No wallet found"; b.disabled = true; b.title = "Install a browser wallet such as MetaMask or Rabby to challenge or withdraw. Reading works without one."; return; }
     if (!wallet.account) { b.textContent = "Connect wallet"; b.disabled = false; return; }
@@ -795,8 +797,8 @@
 
   var refreshButton = $("[data-refresh]");
   if (refreshButton) refreshButton.addEventListener("click", function () { timelineLoaded = false; refresh(); });
-  wireRuleCheck();
   wirePlacePick();
+  wireRuleCheck();
   if (page === "claims" || page === "claim" || page === "workspace") {
     refresh();
     setInterval(function () { if (!document.hidden) refresh(); }, 45000);

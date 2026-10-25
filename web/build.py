@@ -3,7 +3,9 @@
 Run:  python web/build.py
 
 Pages written
-  index.html            what this is, who it is for, how it is built, what it does not claim
+  index.html            landing: what this is, then enter
+  login.html            desk gate (demo access, no password)
+  overview.html         the method: who it is for, how it is built, what it does not claim
   claims.html           the seven places for the flood week, with live testnet state
   claim-<place>.html    one page per place: evidence, signatures, timeline, actions
   backtest.html         agreement counts, rule check, downloads, how to reproduce
@@ -11,7 +13,7 @@ Pages written
   for-insurer.html      trigger-design board (rainfall-only vs this rule)
   for-reinsurer.html    event-loss layers (hazard, exposure, modeled, unmodeled)
   for-responder.html    second-signal action board
-  for-data.html         source reliability for ICPAC / Kenya Met
+  for-data.html         ICPAC / Kenya Met desk (local API)
   for-research.html     open method and downloads
   for-farmer.html       plain-language reason, no wallet
                         (claims.html also ends with the escrow, the committed table, withdrawals, the sandbox mirror)
@@ -251,17 +253,21 @@ def build_config(deployment: dict | None, places: list[dict]) -> dict:
 # shared pieces
 
 NAV = [
-    ("index.html", "Overview", "overview"),
+    ("index.html", "Home", "home"),
+    ("login.html", "Enter", "login"),
+    ("overview.html", "Method", "overview"),
     ("claims.html", "Claims", "claims"),
     ("backtest.html", "Backtest", "backtest"),
-    ("workspaces.html", "Workspaces", "workspaces"),
+    ("workspaces.html", "Desks", "workspaces"),
 ]
 
 
-def shell(*, title: str, desc: str, key: str, page: str, body: str, zone: str = "") -> str:
+def shell(*, title: str, desc: str, key: str, page: str, body: str, zone: str = "", skin: str = "", scripts: tuple[str, ...] = ()) -> str:
     current = ' aria-current="page"'
     nav = "".join(f'<a href="{href}"{current if key == k else ""}>{label}</a>' for href, label, k in NAV)
     zone_attr = f' data-zone="{escape(zone)}"' if zone else ""
+    skin_attr = f' class="{escape(skin)}"' if skin else ""
+    extra = "".join(f'<script src="{escape(src)}" defer></script>\n' for src in scripts)
     built = datetime.now(timezone.utc).strftime("%d %b %Y")
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -271,15 +277,35 @@ def shell(*, title: str, desc: str, key: str, page: str, body: str, zone: str = 
 <title>{escape(title)}</title>
 <meta name="description" content="{escape(desc)}">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body {{ background: #f6f4ef; color: #141c22; }}
+  html[data-theme="dark"], html[data-theme="dark"] body {{ background: #070c12; color: #f3f1ea; }}
+  main {{ display: block; }}
+  img {{ max-width: 100%; }}
+</style>
+<script>
+(function () {{
+  try {{
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  }} catch (e) {{
+    document.documentElement.setAttribute("data-theme", "light");
+  }}
+}})();
+</script>
 </head>
-<body data-page="{page}"{zone_attr}>
+<body data-page="{page}"{zone_attr}{skin_attr}>
 <a class="skip" href="#main">Skip to the content</a>
 <div class="band" role="note"><div class="wrap"><span><b>Testnet only.</b> Nothing here moves real money.</span><span><b>M-PESA is a sandbox.</b></span><span>Unaudited contracts.</span></div></div>
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
   <nav class="nav" aria-label="Pages">{nav}<a href="{REPO}">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
@@ -302,9 +328,11 @@ def shell(*, title: str, desc: str, key: str, page: str, body: str, zone: str = 
   <div><h3>These pages</h3><p>Generated {built} from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+{extra}
 </body>
 </html>
 """
@@ -351,6 +379,185 @@ def live_bar() -> str:
 
 
 # ----------------------------------------------------------------------------
+# door: landing and desk gate
+
+
+IMG_NOTE = "Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline."
+
+
+def page_landing(places) -> str:
+    n = len(places)
+    radar_signed = sum(1 for p in places if p["decision"] == "yes")
+    radar_no = sum(1 for p in places if p["decision"] == "no")
+    unassessed = sum(1 for p in places if p["decision"] == "abstain")
+    rain_signed = sum(1 for p in places if p["rain"] == "yes")
+    rain_mm = published_total()
+    modeled = next((p for p in places if p["decision"] == "yes" and p["rain"] == "yes"), places[0])
+    body = f"""<section class="hero-split" id="top">
+  <div class="hero-photo">
+    <img src="media/hero-basin.jpg" alt="">
+    <p class="img-note">{escape(IMG_NOTE)}</p>
+  </div>
+  <div class="hero-copy">
+    <p class="eyebrow">Verification layer · flood data · Kenya</p>
+    <h1>See which flood data signed.</h1>
+    <p class="lede">Aetheris checks satellite rainfall against Sentinel-1 radar for a named place and week, then records the result where anyone can check it or challenge it. No machine learning. One frozen rule. One named week: the Nyando basin, {WEEK_TEXT}.</p>
+    <p class="cta"><a class="btn primary" href="login.html" data-enter>Enter the desks</a> <a class="btn" href="overview.html">Read the method</a></p>
+  </div>
+</section>
+
+<section class="block" id="week"><div class="wrap">
+  <div class="sec-head"><span class="num">01</span><h2>This week, in the files</h2>
+  <p>Seven places that news named as flooded. Counts only. Not an accuracy figure.</p></div>
+  <ul class="stat-cards">
+    <li>
+      <img src="media/desk-field.jpg" alt="">
+      <div>
+        <p class="n">{n}</p>
+        <h3>Named places</h3>
+        <p>The label log is news and situation reports, not a survey we ran. Reports favour places reporters could reach.</p>
+      </div>
+    </li>
+    <li>
+      <img src="media/strip-rain.jpg" alt="">
+      <div>
+        <p class="n rain">{rain_mm:.1f}<span class="unit"> mm</span></p>
+        <h3>CHIRPS signed {rain_signed} of {n}</h3>
+        <p>One upstream catchment reading, applied everywhere. A millimetre total here is not a gauge total. Rainfall alone never opens a claim.</p>
+      </div>
+    </li>
+    <li>
+      <img src="media/strip-water.jpg" alt="">
+      <div>
+        <p class="n radar">{radar_signed}</p>
+        <h3>Radar also signed</h3>
+        <p>Assessed {radar_signed + radar_no}. Below the line {radar_no}. No outline we would measure: {unassessed}. Unknown is not “no flood”.</p>
+      </div>
+    </li>
+  </ul>
+  <p class="note">The one place both sources signed is {escape(modeled['name'])}. That is the live claim on Sepolia.</p>
+</div></section>
+
+<section class="block alt" id="built"><div class="wrap">
+  <div class="sec-head"><span class="num">02</span><h2>What we have built</h2>
+  <p>A check you can open, not a score you are asked to trust.</p></div>
+  <div class="story">
+    <div class="story-photo"><img src="media/enter-radar.jpg" alt=""><p class="img-note">{escape(IMG_NOTE)}</p></div>
+    <div>
+      <h3>Two sources, one frozen rule</h3>
+      <p>Radar is mandatory. Rainfall corroborates. The rule in <code>config/rule.yaml</code> was frozen before this week was scored. Its hash is on the contract. If the bytes change, the hash will not match.</p>
+      <h3>A claim you can challenge</h3>
+      <p>When both sources sign, a 24-hour window opens on Sepolia. Anyone with a wallet can challenge. One named referee key can uphold or reject. Payouts are testnet ETH in an escrow, once, after Finalized. M-PESA in this project is a labelled sandbox.</p>
+      <h3>A desk for each job</h3>
+      <p>The insurer sees rainfall-only versus this rule. The reinsurer sees one named event layered like a catastrophe model, with an indicative JRC depth-damage sheet labelled adapted or assumption. Responders get a second-signal board. ICPAC and Kenya Met get a connected source desk from the same files. Research gets the counts and the commands. Farmers get one sentence. None of this is machine learning.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="block" id="desks"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Who each dashboard is for</h2>
+  <p>Enter as that person. We open that desk. Demo access, no password.</p></div>
+  <div class="ws-grid">
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-rain.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Trigger analyst</span><h3>Insurer</h3><p>Rainfall would have paid {rain_signed}. This rule paid {radar_signed}. That gap is the basis-risk record.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-water.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Event loss</span><h3>Reinsurer</h3><p>Hazard, stand-in TIV, JRC-adapted damage, parametric grant. One event, not a stochastic catalogue.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/hero-basin.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Second signal</span><h3>Responder</h3><p>Act where radar also signed. Hold where only rainfall signed. Do not invent a reading where we could not look.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/enter-radar.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">ICPAC / Kenya Met</span><h3>Data desk</h3><p>CHIRPS versus Sentinel-1 from <code>/api/desk</code>. Pixel counts and geometry, not a loss number.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/strip-water.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Open method</span><h3>Research</h3><p>Agreement table, frozen rule, downloads. Repeat the count. Do not take the page on trust.</p></div>
+    </a>
+    <a class="ws-card" href="login.html">
+      <img src="media/desk-field.jpg" alt="">
+      <div class="ws-body"><span class="who-tag">Plain language</span><h3>Farmer view</h3><p>What the rule said about a place, in one sentence. No wallet. No money moves from that page.</p></div>
+    </a>
+  </div>
+</div></section>
+
+<section class="block alt" id="limits"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>What this is not</h2>
+  <p>Say the limits in the same breath as the work.</p></div>
+  <ul class="limits">
+    <li><b>Not machine learning.</b><span>A frozen prior on open water and a catchment rainfall line. We did not train on this week.</span></li>
+    <li><b>Not an accuracy percentage.</b><span>Seven news reports cannot carry one. We publish counts.</span></li>
+    <li><b>Not a catastrophe model.</b><span>The reinsurer page is one named flood. No AAL, EP curve, or return period.</span></li>
+    <li><b>Pictures are not evidence.</b><span>The photographs are decorative. They are not the 6 May Sentinel-1 scene and not a flood outline.</span></li>
+    <li><b>Unknown is not “no flood”.</b><span>Three places have no outline we would measure. Radar was not run there.</span></li>
+    <li><b>Payouts are not real.</b><span>Testnet ETH. M-PESA is a sandbox. The contracts are unaudited.</span></li>
+  </ul>
+  <p class="cta"><a class="btn primary" href="login.html" data-enter>Enter the desks</a> <a class="btn" href="overview.html">Read the full method</a></p>
+</div></section>"""
+    return shell(
+        title="Aetheris: a verification layer for flood data in Kenya",
+        desc="Check satellite rainfall against Sentinel-1 radar for a named place and week. No machine learning. Enter a desk to open a dashboard.",
+        key="home",
+        page="home",
+        skin="skin-door",
+        body=body,
+    )
+
+
+def page_login() -> str:
+    choices = [
+        ("icpac", "ICPAC", "Compare CHIRPS and Sentinel-1 on the week you already publish."),
+        ("kenya-met", "Kenya Meteorological Department", "The same source desk, labelled for Kenya Met."),
+        ("insurer", "Insurer or aggregator", "What a rainfall-only trigger would have paid, and what this rule paid."),
+        ("reinsurer", "Reinsurer", "One named event: hazard, exposure, indicative loss."),
+        ("responder", "Disaster responder", "Act where radar also signed. Hold where only rainfall signed."),
+        ("research", "Researcher", "Counts, the frozen rule, and the files to reproduce them."),
+        ("farmer", "Farmer view", "What the rule said about a place, in one sentence."),
+    ]
+    radios = "".join(
+        f"""<label class="desk-pick">
+      <input type="radio" name="role" value="{key}" required>
+      <span><b>{escape(title)}</b><span class="pick-why">{escape(why)}</span></span>
+    </label>"""
+        for key, title, why in choices
+    )
+    body = f"""<section class="split-enter">
+  <div class="split-photo">
+    <img src="media/enter-radar.jpg" alt="">
+    <p class="img-note">{escape(IMG_NOTE)}</p>
+  </div>
+  <div class="split-form">
+    <p class="eyebrow">Enter a desk</p>
+    <h1>Pick who you are. We open that dashboard.</h1>
+    <p class="lede">This is demo access. There is no password and we do not hold accounts. Nothing here is a machine-learning score.</p>
+    <form class="login" data-login>
+      <fieldset>
+        <legend>Who are you</legend>
+        {radios}
+      </fieldset>
+      <label class="name-field">Your name <span class="opt">(optional)</span>
+        <input type="text" name="name" maxlength="80" autocomplete="name" placeholder="Shown on the desk">
+      </label>
+      <p class="cta"><button class="btn primary" type="submit">Open desk</button></p>
+      <p class="api-status wait" data-login-status hidden></p>
+    </form>
+  </div>
+</section>"""
+    return shell(
+        title="Enter a desk · Aetheris",
+        desc="Demo access to the Aetheris desks. Pick who you are. There is no password and no machine learning.",
+        key="login",
+        page="login",
+        skin="skin-door",
+        body=body,
+    )
+
+
+# ----------------------------------------------------------------------------
 # overview
 
 
@@ -369,7 +576,7 @@ def page_overview(places, counts, deployment) -> str:
   <p class="lede">Flood payouts and alerts rest on satellite rainfall estimates that are sparse on the ground and often wrong in heavy rain.
   <strong>Aetheris checks them against Sentinel-1 radar</strong>, which sees whether land is actually under water, for each place and week,
   and records the result where anyone can check it or challenge it. This is the first week we checked: the Nyando basin, {WEEK_TEXT}.</p>
-  <p class="cta"><a class="btn primary" href="workspaces.html">Open a workspace</a> <a class="btn" href="claims.html">See the claims</a> <a class="btn" href="{first_open['page']}">Open the one live claim</a> <a class="btn" href="backtest.html">Read the backtest</a></p>
+  <p class="cta"><a class="btn primary" href="login.html">Enter a desk</a> <a class="btn" href="claims.html">See the claims</a> <a class="btn" href="{first_open['page']}">Open the one live claim</a> <a class="btn" href="backtest.html">Read the backtest</a></p>
   <div class="facts">
     <div class="fact"><span class="n">{n}</span><span class="k">places that news reports said flooded</span></div>
     <div class="fact"><span class="n rain">{rain_signed}</span><span class="k">where rainfall data signed “flood”</span></div>
@@ -428,7 +635,7 @@ def page_overview(places, counts, deployment) -> str:
         <td><b>Assumption.</b> Not researched.</td></tr>
       <tr><th scope="row">Data producers <span class="note-s">ICPAC, Kenya Met</span></th>
         <td>Gauges are sparse, station data is gated, and users cannot tell which satellite product to trust.</td>
-        <td>A reliability check on CHIRPS and Sentinel-1, with files and a hash. <a href="for-data.html">Data workspace →</a></td>
+        <td>A connected desk on CHIRPS and Sentinel-1, served from the same files. <a href="for-data.html">Data desk →</a></td>
         <td><b>Researched.</b> Station sparsity, data-sharing terms and rainfall bias are cited above.</td></tr>
       <tr><th scope="row">Researchers and modellers</th>
         <td>Validation studies contradict each other, and gauge data is hard to get.</td>
@@ -888,8 +1095,13 @@ def render_all() -> tuple[dict[str, str], dict]:
     counts = load_counts()
     deployment = json.loads(DEPLOYMENT.read_text(encoding="utf-8")) if DEPLOYMENT.exists() else None
     config = build_config(deployment, places)
-    pages = {"index.html": page_overview(places, counts, deployment), "claims.html": page_claims(places, deployment),
-             "backtest.html": page_backtest(places, counts)}
+    pages = {
+        "index.html": page_landing(places),
+        "login.html": page_login(),
+        "overview.html": page_overview(places, counts, deployment),
+        "claims.html": page_claims(places, deployment),
+        "backtest.html": page_backtest(places, counts),
+    }
     pages.update(workspaces.render_all(sys.modules[__name__], places, counts, deployment))
     for p in places:
         pages[p["page"]] = page_claim(p, deployment)

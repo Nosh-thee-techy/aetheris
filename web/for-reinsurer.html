@@ -6,6 +6,22 @@
 <title>Reinsurer workspace · event loss · Aetheris</title>
 <meta name="description" content="Hazard, exposure, modeled loss and the unmodeled residual for one named Nyando flood. One event, not a catastrophe model.">
 <link rel="stylesheet" href="styles.css">
+<style>
+  html, body { background: #f6f4ef; color: #141c22; }
+  html[data-theme="dark"], html[data-theme="dark"] body { background: #070c12; color: #f3f1ea; }
+  main { display: block; }
+  img { max-width: 100%; }
+</style>
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("aetheris-theme");
+    document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 </head>
 <body data-page="workspace">
 <a class="skip" href="#main">Skip to the content</a>
@@ -13,13 +29,17 @@
 
 <header class="mast"><div class="wrap">
   <a class="mark" href="index.html">Aether<span>is</span></a>
-  <nav class="nav" aria-label="Pages"><a href="index.html">Overview</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Workspaces</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
-  <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  <nav class="nav" aria-label="Pages"><a href="index.html">Home</a><a href="login.html">Enter</a><a href="overview.html">Method</a><a href="claims.html">Claims</a><a href="backtest.html">Backtest</a><a href="workspaces.html" aria-current="page">Desks</a><a href="https://github.com/Nosh-thee-techy/aetheris">Code</a></nav>
+  <div class="tools">
+    <button class="btn small" type="button" data-theme>Dark mode</button>
+    <div class="session" hidden data-session><span data-session-who></span><button class="btn small" type="button" data-leave>Leave</button></div>
+    <button class="wallet" type="button" data-wallet hidden>Connect wallet</button>
+  </div>
 </div></header>
 
 <main id="main">
-<section class="page-head"><div class="wrap">
-  <nav class="ws-nav" aria-label="Workspaces"><a href="workspaces.html">All workspaces</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html" aria-current="page">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
+<div class="ribbon" aria-hidden="true"><img src="media/strip-water.jpg" alt=""><p class="img-note">Decorative picture. Not the 6 May 2024 Sentinel-1 scene, and not a measured flood outline.</p></div><section class="page-head"><div class="wrap">
+  <nav class="ws-nav" aria-label="Desks"><a href="workspaces.html">All desks</a><a href="for-insurer.html">Insurer</a><a href="for-reinsurer.html" aria-current="page">Reinsurer</a><a href="for-responder.html">Responder</a><a href="for-data.html">Data</a><a href="for-research.html">Research</a><a href="for-farmer.html">Farmer view</a></nav>
   <p class="eyebrow">Reinsurer workspace · event loss</p>
   <h1>Nyando basin, 4–6 May 2024. One event. <em>Not a catastrophe model.</em></h1>
   <p class="lede">A cat model needs thousands of simulated years, a vulnerability function, and your own exposure file. What we can give you honestly is the footprint of one named flood, layered the way you already read an event: hazard, exposure, modeled loss, and the residual the rule left unmodeled. Put it in your model. Do not treat this page as the model.</p>
@@ -263,8 +283,10 @@
   <div><h3>These pages</h3><p>Generated 25 Oct 2026 from the repository’s own files by <code>web/build.py</code>. Live state is read from Sepolia in your browser. IEEE ClimateChain Global Hackathon 2026, Climate Data &amp; Environmental Monitoring.</p></div>
 </div></footer>
 
+<script src="session.js" defer></script>
 <script src="vendor/ethers-6.17.0.umd.min.js" defer></script>
 <script src="chain-config.js" defer></script>
 <script src="app.js" defer></script>
+
 </body>
 </html>
