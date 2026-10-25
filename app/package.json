@@ -1,0 +1,15 @@
+{
+  "name": "aetheris-desks",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}

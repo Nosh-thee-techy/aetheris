@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aetheris</title>
+  <meta name="description" content="Verification layer for flood data in Kenya. No machine learning.">
+  <style>
+    html, body { margin: 0; background: #f6f4ef; color: #141c22; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background: #16181c; color: #f4f6f8; }
+    #app { min-height: 100vh; }
+  </style>
+  <script>
+    try {
+      var t = localStorage.getItem("aetheris-theme");
+      document.documentElement.setAttribute("data-theme", t === "dark" ? "dark" : "light");
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <p style="margin:0;padding:1.5rem">Opening Aetheris…</p>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
