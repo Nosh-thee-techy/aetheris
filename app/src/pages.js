@@ -168,6 +168,7 @@ export function claimsPage(ctx) {
       <h1>Seven places, one flood week</h1>
       <p class="lede">News reports named these seven places as flooded. For each one, the rule asks radar and rainfall whether they sign. Where both do, a claim opens on the testnet. Rainfall alone never opens a claim.</p>
       <p class="note">${esc(chain?.note || "Snapshot at deploy. The page does not invent chain state.")} Nothing here moves real money. M-PESA is a labelled sandbox.</p>
+      <p class="live-status" data-live-status>Live state is off until Sepolia answers. The snapshot stays if it does not.</p>
       <div class="sheet">
         <p><b>Rainfall, for every place at once.</b> It is read on the upstream headwaters, not on each place.</p>
         ${rainBar(cache)}
@@ -186,9 +187,12 @@ export function claimsPage(ctx) {
           <div><span class="k">Funder</span><a href="${esc(explorer)}/address/${esc(chain.roles.funder)}"><code>${esc(chain.roles.funder)}</code></a></div>
           <div><span class="k">Pool at snapshot</span>${esc(chain.pool_balance_eth)} ETH</div>
         </div>
-        <p class="note">Snapshot at ${esc(chain.snapshot_at)}. ${esc(chain.beneficiaries)}.</p>
+        <p class="note">Snapshot at ${esc(chain.snapshot_at)}. ${esc(chain.beneficiaries)}. No hand-release. Only a finalized claim, once.</p>
       ` : `<p class="note">Not deployed yet.</p>`}
-      <p class="note">Money never gets pushed. Returned bonds and payouts wait as a balance the owner pulls. Wallet writes are not on this page. The M-PESA rail is a sandbox record only: no Daraja call, no shillings moved.</p>
+      <div data-live-escrow></div>
+      <div data-live-claim></div>
+      <p class="txlog" data-tx-log hidden></p>
+      <p class="note" data-sandbox><b>SANDBOX.</b> No Daraja call. No shillings moved.</p>
     </div></section>
   `, "/claims");
 }
@@ -309,8 +313,12 @@ export function placePage(ctx, slug) {
       <p class="lede">${esc(place.scale)}</p>
       <div class="sheet">
         <p><span class="dot ${esc(place.marker)}"></span> <b>${esc(place.outcome)}</b></p>
-        <p>${esc(place.snapshot)}. This is the deploy snapshot. The page does not invent a later chain state.</p>
+        <p>${esc(place.snapshot)}. Snapshot at deploy. Live state is below, only if Sepolia answers.</p>
       </div>
+      <p class="live-status" data-live-status>Reading Sepolia…</p>
+      <div data-live-claim></div>
+      <p class="txlog" data-tx-log hidden></p>
+      <p class="note" data-sandbox><b>SANDBOX.</b> No Daraja call. No shillings moved.</p>
     </div></section>
     <section class="block alt"><div class="wrap">
       <div class="sec-head"><span class="num">01</span><h2>The reason for this decision</h2></div>
@@ -345,7 +353,7 @@ export function placePage(ctx, slug) {
           ${(onChain.signers || []).map((s) => `<dt>${esc(s.role)}</dt><dd><code>${esc(s.evidence)}</code></dd>`).join("")}
         </dl>
       ` : `<p class="lede">No signature exists for this place. The rule did not fire here, so neither attester signed, and the contract holds nothing for it. Silence counts as no.</p>`}
-      <p class="note">Wallet writes (challenge, finalize, release) are not on this page. Testnet only. The referee cannot be an attester.</p>
+      <p class="note">Writes go through your wallet on Sepolia. The referee cannot be an attester. Testnet only.</p>
     </div></section>
     <section class="block"><div class="wrap">
       <div class="sec-head"><span class="num">04</span><h2>The identifiers, so you can recompute them</h2></div>

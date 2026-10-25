@@ -202,6 +202,15 @@ footer { padding: 2rem 0 3rem; color: var(--ink-3); font-size: 0.9rem; }
 .ids dd { margin: 0; }
 code { overflow-wrap: anywhere; word-break: break-all; font-family: ui-monospace, Consolas, monospace; font-size: 0.88em; }
 .ids code { display: block; font-size: 0.8rem; line-height: 1.45; background: var(--card); border: 1px solid var(--rule); padding: 0.55rem 0.7rem; margin-top: 0.3rem; }
+.walk { margin: 1.2rem 0 0; }
+.live-status { margin: 0.8rem 0; padding: 0.55rem 0.75rem; border-left: 4px solid var(--ink-3); background: var(--card); }
+.live-status.ok { border-left-color: var(--radar); }
+.live-status.bad { border-left-color: var(--alert); }
+.txlog { margin: 0.8rem 0; padding: 0.55rem 0.75rem; border: 1px solid var(--rule); background: var(--card); }
+.txlog.wait { border-color: var(--rain); }
+.txlog.ok { border-color: var(--radar); }
+.txlog.bad { border-color: var(--alert); }
+label.field input[type="checkbox"] { width: auto; display: inline; margin-right: 0.4rem; }
 html[data-theme="dark"] #kenya-map { background: #1e2126; }
 .ops { font-family: Inter, Roboto, "Segoe UI", system-ui, sans-serif; color: var(--ink); }
 .ops .band,

@@ -1,6 +1,7 @@
 import "./styles.css";
 import { desk, leave, me } from "./api.js";
 import { focusBox, mountKenyaMap } from "./map.js";
+import { afterPage, onAct, onWalletClick, paintWalletButton } from "./live.js";
 import { backtestPage, claimsPage, methodPage, normalizePath, placePage } from "./pages.js";
 
 const DESKS = [
@@ -120,7 +121,9 @@ function shell(title, inner, active) {
   const nav = links.length
     ? `<nav class="nav">${links.map((item) => `<a href="${item.href}" class="${item.href === active ? "on" : ""}">${item.label}</a>`).join("")}</nav>`
     : "";
+  const onChain = path === "/claims" || path.startsWith("/claim/");
   let tools = `<button type="button" class="btn small" data-theme>${theme === "dark" ? "Light mode" : "Dark mode"}</button>`;
+  if (onChain) tools += `<button type="button" class="btn small" data-wallet>Connect wallet</button>`;
   if (viewer && !door) {
     tools = `<span class="who">${esc(viewer.role_label)}</span>${tools}<button type="button" class="btn small" data-leave>Leave</button>`;
   } else if (!door && !viewer) {
@@ -164,8 +167,8 @@ function landing() {
         <h1>Rain said flood in ${places.length} places. Radar agreed in ${radarYes}.</h1>
         <p class="lede">After a flood, insurance and alerts often trust a rainfall number. That number can be wrong. Aetheris puts the rain number next to a radar picture of open water, for a named place, and writes down whether they agree. No machine learning. This is a demo. No real money moves.</p>
         <div class="cta">
-          <a class="btn primary" href="/enter">Enter a desk</a>
-          <a class="btn" href="/method">How the check works</a>
+          <a class="btn primary" href="/enter">1. Enter as insurer</a>
+          <a class="btn" href="/claim/kabonyo-kanyagwal">2. Open Kabonyo</a>
         </div>
       </div>
     </section>
@@ -209,6 +212,12 @@ function landing() {
         <li><div><p class="n">${unknown}</p><p>We could not look. No outline, so no radar reading</p></div></li>
       </ul>
       <p class="note">These are counts from the files. They are not an accuracy score. Three names had no outline we would measure, so radar was not run there.</p>
+      <ol class="steps walk">
+        <li><b><a href="/enter">Enter as insurer.</a></b> Rain would have paid ${rainYes}. This rule paid ${opened.length}.</li>
+        <li><b><a href="/claim/kabonyo-kanyagwal">Open Kabonyo-Kanyagwal.</a></b> The one place both sources signed. Read Sepolia. Challenge or finalize from your wallet.</li>
+        <li><b><a href="/backtest">Open the backtest.</a></b> Agreements, disagreements, found, missed. False triggers stay 0: no “did not flood” labels.</li>
+        <li><b><a href="/claims">Open claims and the escrow.</a></b> Testnet only. Pays once, after Finalized. No hand-release. M-PESA is SANDBOX.</li>
+      </ol>
     </div></section>
     <section class="block"><div class="wrap">
       <div class="sec-head"><span class="num">03</span><h2>Pick who you are</h2></div>
@@ -395,9 +404,29 @@ function insurerSheet(place) {
 }
 
 function dataDesk() {
-  return deskLayout("data", "Data desk", "ICPAC / Kenya Met sheet. Pixels, rain, miss, geometry. Same CSV. Not a flood forecast.", `
-    <p class="note">Radar open-water fraction is not flood depth. Four OSM boxes only.</p>
-  `);
+  const places = cache?.places || [];
+  const rain = cache?.rainfall || {};
+  const radar = cache?.radar || {};
+  const rows = places.map((p) => {
+    const frac = p.fraction == null ? "Not measured" : `${(p.fraction * 100).toFixed(1)}%`;
+    const geom = p.zone ? "OSM box" : "No outline";
+    return `<tr><th>${esc(p.name)}</th><td>${esc(p.radar)}</td><td>${esc(frac)}</td><td>${esc(p.rain)}</td><td>${esc(geom)}</td><td>${esc(p.land_pixels ?? "—")}</td></tr>`;
+  }).join("");
+  return deskLayout(
+    "data",
+    "Where rain and radar disagreed",
+    "Same CSVs as the scorer. Radar is the reference for this check, not ground truth. No gauges. Not a flood forecast.",
+    `<ul class="stats">
+      <li><div><p class="n rain">${esc(rain.mm ?? "—")} mm</p><p>One catchment, ${esc(rain.product || "CHIRPS")}. Line ${esc(rain.line_mm ?? 40)} mm / ${esc(rain.window_days ?? 3)} days.</p></div></li>
+      <li><div><p class="n radar">${radar.signed ?? 0}</p><p>Radar signed. ${radar.below ?? 0} under the line. ${radar.no_geometry ?? 0} not measured.</p></div></li>
+    </ul>
+    <table>
+      <caption>Seven news-named places. Radar fraction is not flood depth.</caption>
+      <thead><tr><th>Place</th><th>Radar</th><th>Open water</th><th>Rain</th><th>Geometry</th><th>Land pixels</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p class="note">Four OSM boxes only. We do not invent a box. <a href="/data/radar_fractions.csv">radar_fractions.csv</a> · <a href="/data/observations.csv">observations.csv</a></p>`,
+  );
 }
 
 function insurerDesk() {
@@ -705,9 +734,27 @@ function showResponder(slug) {
 }
 
 function researchDesk() {
-  return deskLayout("research", "Research desk", "What the files hold. No machine learning. Do not tune thresholds on this season.", `
-    <p class="note">Method, claims and backtest are on this app. The numbers still come from the same CSVs.</p>
-  `);
+  const rule = cache?.rule || {};
+  return deskLayout(
+    "research",
+    "An open method you can rerun",
+    "Frozen rule, label log, counts. One week. Indicative, not a finished validation study. No machine learning. Do not tune thresholds on this season.",
+    `<ul class="stats">
+      <li><div><p class="n">${esc(rule.frozen_on || "—")}</p><p>Rule frozen. Hash ${esc(rule.thresholds_hash || "")}</p></div></li>
+    </ul>
+    <p class="cta">
+      <a class="btn primary" href="/method">Method</a>
+      <a class="btn" href="/backtest">Backtest</a>
+      <a class="btn" href="/claims">Claims</a>
+    </p>
+    <ul class="limits">
+      <li><b><a href="/data/counts.csv">counts.csv</a></b><span>Found, missed, false. False stays 0: no dry labels.</span></li>
+      <li><b><a href="/data/label_log.csv">label_log.csv</a></b><span>The seven names and the reports.</span></li>
+      <li><b><a href="/data/rule.yaml">rule.yaml</a></b><span>Byte for byte. That file’s hash is in every claim id.</span></li>
+    </ul>
+    <pre class="cmd"><code>python -m backtest.score
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror</code></pre>`,
+  );
 }
 
 const PHONE_COPY = {
@@ -752,7 +799,7 @@ const PHONE_COPY = {
     amount: (eth) => `Practice amount for this place: ${eth} test ETH.`,
     notShillings: "Not shillings for one farmer.",
     notArrived: "It has not come. Ask the person holding this phone.",
-    noMpesa: "This demo sends no M-PESA.",
+    noMpesa: "SANDBOX. This demo sends no M-PESA.",
     notSeed: "Not money for seed. Water under a crop may not show.",
     house: (homes, kes) => `Together, a house guess (${homes}): ${kes}. Not one person's payment.`,
     noPay: "No payment from this check.",
@@ -799,7 +846,7 @@ const PHONE_COPY = {
     amount: (eth) => `Kiasi cha mazoezi hapa: ${eth} test ETH.`,
     notShillings: "Si shilingi za mkulima mmoja.",
     notArrived: "Haijafika. Uliza aliye na simu hii.",
-    noMpesa: "Demo hii haitumi M-PESA.",
+    noMpesa: "SANDBOX. Demo hii haitumi M-PESA.",
     notSeed: "Si pesa ya mbegu. Maji chini ya mmea hayaonekani.",
     house: (homes, kes) => `Pamoja, kesi ya nyumba (${homes}): ${kes}. Si malipo ya mtu mmoja.`,
     noPay: "Hakuna malipo kutoka ukaguzi huu.",
@@ -845,7 +892,7 @@ const PHONE_COPY = {
     amount: (eth) => `Pesa mar temo kae: ${eth} test ETH.`,
     notShillings: "Ok en shilingi mar ng'ato achiel.",
     notArrived: "Pok obiro. Penjo ng'at man kod simu.",
-    noMpesa: "Onge M-PESA.",
+    noMpesa: "SANDBOX. Onge M-PESA.",
     notSeed: "Ok en pesa mar cham. Pii e cham nyalo kik nenre.",
     house: (homes, kes) => `Kesi mar udi (${homes}): ${kes}. Ok en pesa mar ng'ato achiel.`,
     noPay: "Onge pesa mar nono ni.",
@@ -1134,7 +1181,8 @@ function farmerDesk() {
             <li>Press <b>9</b> to change the language. <b>0</b> goes back. End returns to the start.</li>
           </ol>
           <div data-phone-detail></div>
-          <p class="note">On a yes, the practice amount is 0.001 test ETH for the whole place, from the committed table. It is not shillings for one farmer, and nothing has been sent. Where a news report named homes, the shilling figure is a house-damage guess for all of those homes together. It is not a payment, and not money for seed. Water under a crop may not show on the satellite. If nothing arrives, ask the person holding the phone. This demo sends no M-PESA. The <a href="https://ieee-climatechain-hack.devpost.com/rules">Devpost rules</a> ask about climate impact, and whether communities could use a project.</p>
+          <p class="note" data-sandbox><b>SANDBOX.</b> This demo sends no M-PESA. No Daraja call. No shillings moved. If a testnet release happens, the record stays labelled SANDBOX.</p>
+          <p class="note">On a yes, the practice amount is 0.001 test ETH for the whole place, from the committed table. It is not shillings for one farmer, and nothing has been sent. Where a news report named homes, the shilling figure is a house-damage guess for all of those homes together. It is not a payment, and not money for seed. Water under a crop may not show on the satellite. If nothing arrives, ask the person holding the phone.</p>
         </aside>
       </div>
     </div></section>
@@ -1174,7 +1222,26 @@ function page() {
 }
 
 function bind() {
+  document.body.addEventListener("change", (ev) => {
+    const box = ev.target.closest("[data-confirm-challenge]");
+    if (!box) return;
+    const btn = document.querySelector("[data-act='challenge']");
+    if (btn) btn.disabled = !box.checked;
+  });
   document.body.addEventListener("click", async (ev) => {
+    const walletBtn = ev.target.closest("[data-wallet]");
+    if (walletBtn) {
+      ev.preventDefault();
+      await onWalletClick();
+      return;
+    }
+    const actBtn = ev.target.closest("[data-act]");
+    if (actBtn) {
+      ev.preventDefault();
+      const slug = pathOf().startsWith("/claim/") ? pathOf().slice("/claim/".length) : "kabonyo-kanyagwal";
+      await onAct(actBtn.dataset.act, slug);
+      return;
+    }
     const themeBtn = ev.target.closest("button[data-theme]");
     if (themeBtn) {
       setTheme(theme === "dark" ? "light" : "dark");
@@ -1282,6 +1349,8 @@ async function render() {
       if (first?.zone) focusBox(first.slug);
     });
   }
+  paintWalletButton();
+  afterPage(pathOf()).catch(() => {});
 }
 
 bind();
