@@ -763,11 +763,40 @@
     }
   }
 
+  function wirePlacePick() {
+    var root = $("[data-place-map]");
+    if (!root) return;
+    function show(slug, writeHash) {
+      $all("[data-sheet]").forEach(function (node) { node.hidden = node.getAttribute("data-sheet") !== slug; });
+      $all("[data-pick]").forEach(function (node) {
+        var on = node.getAttribute("data-pick") === slug;
+        node.classList.toggle("on", on);
+        if (node.hasAttribute("aria-pressed")) node.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+      if (writeHash && history.replaceState) {
+        history.replaceState(null, "", "#pick/" + slug);
+      }
+    }
+    $all("[data-pick]").forEach(function (node) {
+      node.addEventListener("click", function () { show(node.getAttribute("data-pick"), true); });
+      node.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          show(node.getAttribute("data-pick"), true);
+        }
+      });
+    });
+    var start = (location.hash || "").replace(/^#pick\/?/, "");
+    if (!start || !$('[data-sheet="' + start + '"]')) start = "kabonyo-kanyagwal";
+    show(start, false);
+  }
+
   /* -------------------------------------------------------------------- go */
 
   var refreshButton = $("[data-refresh]");
   if (refreshButton) refreshButton.addEventListener("click", function () { timelineLoaded = false; refresh(); });
   wireRuleCheck();
+  wirePlacePick();
   if (page === "claims" || page === "claim" || page === "workspace") {
     refresh();
     setInterval(function () { if (!document.hidden) refresh(); }, 45000);

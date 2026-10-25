@@ -877,6 +877,7 @@ def copy_data() -> None:
         (ROOT / "backtest" / "checks" / "radar_fractions.csv", "radar_fractions.csv"),
         (ROOT / "backtest" / "observations.csv", "observations.csv"),
         (ROOT / "config" / "rule.yaml", "rule.yaml"),  # byte for byte: its hash is on the chain
+        (ROOT / "backtest" / "checks" / "zones.json", "zones.json"),
     ]:
         shutil.copyfile(src, out / name)
 

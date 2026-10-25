@@ -8,7 +8,9 @@ stochastic catalogue, and the page says so.
 
 from __future__ import annotations
 
+import json
 from html import escape
+from pathlib import Path
 
 from backtest.pipeline import damage as vuln
 
@@ -50,6 +52,108 @@ def workspace_nav(current: str) -> str:
 
 def names(places: list[dict]) -> str:
     return escape(", ".join(p["name"] for p in places)) if places else "None"
+
+
+# OpenStreetMap working boxes from backtest/checks/zones.json. Three named
+# places have no outline; they stay off the drawing on purpose.
+MAP_SHORT = {
+    "ahero": "Ahero",
+    "kabonyo-kanyagwal": "Kabonyo",
+    "kobura": "Kobura",
+    "ombeyi": "Ombeyi",
+}
+MAP_PAD = 0.02
+MAP_W = 640
+MAP_H = 520
+
+
+def load_boxes(root: Path) -> dict:
+    return json.loads((root / "backtest" / "checks" / "zones.json").read_text(encoding="utf-8"))
+
+
+def map_extent(boxes: dict) -> tuple[float, float, float, float]:
+    west = min(b["west"] for b in boxes.values()) - MAP_PAD
+    south = min(b["south"] for b in boxes.values()) - MAP_PAD
+    east = max(b["east"] for b in boxes.values()) + MAP_PAD
+    north = max(b["north"] for b in boxes.values()) + MAP_PAD
+    return west, south, east, north
+
+
+def project(lon: float, lat: float, extent: tuple[float, float, float, float]) -> tuple[float, float]:
+    west, south, east, north = extent
+    x = (lon - west) / (east - west) * MAP_W
+    y = (north - lat) / (north - south) * MAP_H
+    return x, y
+
+
+def render_basin_map(places: list[dict], boxes: dict) -> str:
+    """SVG of the four measured boxes. Unassessed names sit in a list, not on guessed pins."""
+    extent = map_extent(boxes)
+    by_slug = {p["slug"]: p for p in places}
+    drawn = []
+    for slug, box in sorted(boxes.items(), key=lambda item: -(item[1]["east"] - item[1]["west"]) * (item[1]["north"] - item[1]["south"])):
+        p = by_slug[slug]
+        x1, y1 = project(box["west"], box["north"], extent)
+        x2, y2 = project(box["east"], box["south"], extent)
+        kind = "signed" if p["decision"] == "yes" else "no"
+        lx, ly = (x1 + x2) / 2, (y1 + y2) / 2
+        drawn.append(
+            f'<g class="box {kind}" data-pick="{slug}" tabindex="0" role="button" aria-pressed="false" aria-label="{escape(p["name"])}">'
+            f'<rect x="{min(x1, x2):.1f}" y="{min(y1, y2):.1f}" width="{abs(x2 - x1):.1f}" height="{abs(y2 - y1):.1f}"/>'
+            f'<text x="{lx:.1f}" y="{ly:.1f}">{escape(MAP_SHORT[slug])}</text></g>'
+        )
+    nameless = [p for p in places if p["slug"] not in boxes]
+    nameless_list = "".join(
+        f'<li><button type="button" data-pick="{p["slug"]}" aria-pressed="false">{escape(p["name"])}</button>'
+        f'<span>No outline. Not drawn.</span></li>'
+        for p in nameless
+    )
+    picks = "".join(
+        f'<button type="button" class="map-pick" data-pick="{p["slug"]}" aria-pressed="false">{escape(p["name"])}</button>'
+        for p in places
+        if p["slug"] in boxes
+    )
+    return f"""<div class="map-pane" data-place-map>
+  <svg class="basin" viewBox="0 0 {MAP_W} {MAP_H}" role="img" aria-label="Working boxes for the four places that have an OpenStreetMap outline">
+    {"".join(drawn)}
+  </svg>
+  <p class="map-key"><span class="sw radar"></span>Radar signed <span class="sw line"></span>Radar did not sign. Boxes overlap because they are ward extents, not flood outlines.</p>
+  <div class="map-picks">{picks}</div>
+  <ul class="no-geom"><li class="head">Named, no outline</li>{nameless_list}</ul>
+</div>"""
+
+
+def render_place_sheets(places: list[dict], build, deployment) -> str:
+    g = groups(places)
+    modeled_slugs = {x["slug"] for x in g["modeled"]}
+    sheets = []
+    for p in places:
+        v = vuln.row_for(p["slug"])
+        marker, outcome, why = build.verdict(p)
+        frac = build.pct(p["fraction"]) if p["fraction"] is not None else "not measured"
+        hh = v["households_note"] or "No household count printed"
+        parametric = f"{GRANT_ETH} ETH grant" if p["slug"] in modeled_slugs else "No claim opens. Rainfall alone cannot pay."
+        hidden = "" if p["slug"] == "kabonyo-kanyagwal" else " hidden"
+        sheets.append(
+            f"""<article class="place-sheet" data-sheet="{p['slug']}"{hidden}>
+  <p class="who-tag">{escape(p['scale'])}</p>
+  <h3>{escape(p['name'])}</h3>
+  <p class="out"><span class="dot {marker}"></span>{escape(outcome)}</p>
+  <p>{escape(why)}</p>
+  <dl class="stake">
+    <dt>Radar</dt><dd>{escape(frac)} of land pixels · {build.sign_word(p['decision'])}</dd>
+    <dt>Rainfall</dt><dd>{build.sign_word(p['rain'])} · one catchment reading for the week</dd>
+    <dt>Depth</dt><dd>{v['depth_m']:.1f} m <span class="prov {v['depth_provenance']}">{escape(v['depth_provenance'])}</span></dd>
+    <dt>Class</dt><dd>{escape(v['class_label'])} <span class="prov assumption">assumption</span></dd>
+    <dt>Households / TIV</dt><dd>{escape(hh)} · {vuln.kes(v['tiv_kes'])}</dd>
+    <dt>Damage ratio / ground-up</dt><dd>{v['damage_ratio']:.2f} of TIV · {vuln.kes(v['ground_up_kes'])}</dd>
+    <dt>Parametric</dt><dd>{escape(parametric)}</dd>
+    <dt>On the testnet</dt><dd class="live" data-live-zone="{p['slug']}"><span class="snap">{escape(build.snapshot_text(p['slug'], deployment))}</span></dd>
+  </dl>
+  <p class="cta"><a class="btn" href="{p['page']}">Open the claim page</a></p>
+</article>"""
+        )
+    return "".join(sheets)
 
 
 def render_all(build, places, counts, deployment) -> dict[str, str]:
@@ -234,6 +338,15 @@ def page_reinsurer(build, places, counts, deployment) -> str:
     <div class="fact"><span class="n">{modeled_n}</span><span class="k">place the rule modeled as a loss</span></div>
     <div class="fact"><span class="n rain">{unmodeled_n}</span><span class="k">reported floods left unmodeled</span></div>
     <div class="fact"><span class="n radar">{grant_sum(modeled_n)}</span><span class="k">ETH modeled · {grant_sum(rain_n)} ETH if the trigger were rainfall only. Demo amounts, not sums insured.</span></div>
+  </div>
+</div></section>
+
+<section class="block tight" id="pick"><div class="wrap">
+  <div class="sec-head"><span class="num">00</span><h2>Pick a place</h2>
+  <p>Click a box, or a name. The sheet is that place’s hazard, book, damage and live claim. Three names have no outline, so they are not drawn.</p></div>
+  <div class="map-split">
+    {render_basin_map(places, load_boxes(build.ROOT))}
+    <div class="sheet-host">{render_place_sheets(places, build, deployment)}</div>
   </div>
 </div></section>
 

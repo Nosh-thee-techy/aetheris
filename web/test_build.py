@@ -52,6 +52,16 @@ class SiteTests(unittest.TestCase):
         self.assertNotRegex(html, r"(?i)\bprobable maximum loss\b.*\d")
         self.assertNotRegex(html, r"(?i)\breturn period of\b")
 
+    def test_reinsurer_map_draws_only_places_with_outlines(self) -> None:
+        html = self.pages["for-reinsurer.html"]
+        boxes = json.loads((ROOT / "backtest" / "checks" / "zones.json").read_text(encoding="utf-8"))
+        drawn = set(re.findall(r'<g class="box[^"]*" data-pick="([^"]+)"', html))
+        self.assertEqual(drawn, set(boxes))
+        for slug in build.PLACES:
+            self.assertIn(f'data-sheet="{slug}"', html)
+        self.assertIn("No outline. Not drawn.", html)
+        self.assertIn('id="pick"', html)
+
     def test_reinsurer_damage_function_is_labelled_not_measured(self) -> None:
         html = self.pages["for-reinsurer.html"]
         self.assertIn("waist-high", html)

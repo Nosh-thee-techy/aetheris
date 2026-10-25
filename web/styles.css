@@ -428,6 +428,31 @@ dl.stake dd { margin: 0; }
 .farmer-a { font: 600 1.35rem/1.25 var(--serif); margin: 0 0 0.7rem; color: var(--ink); }
 .farmer p { font-size: 1.05rem; }
 
+.map-split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr); gap: 1.5rem; align-items: start; }
+.basin { width: 100%; height: auto; background: var(--card); border: 1px solid var(--rule); }
+.basin .box { cursor: pointer; }
+.basin .box rect { fill: rgba(20, 32, 28, 0.08); stroke: var(--ink); stroke-width: 1.5; }
+.basin .box.signed rect { fill: rgba(15, 85, 96, 0.55); }
+.basin .box.on rect { stroke: var(--rain); stroke-width: 3.5; }
+.basin .box text { font: 600 13px var(--sans); fill: var(--ink); text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+.basin .box.signed text { fill: #fff; }
+.map-key { font-size: 0.85rem; color: var(--ink-3); margin: 0.6rem 0 0.8rem; }
+.map-picks { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.9rem; }
+.map-pick, .no-geom button {
+  font: 600 0.8125rem/1 var(--sans); padding: 0.45rem 0.6rem; border: 2px solid var(--ink); background: transparent;
+  color: var(--ink); cursor: pointer;
+}
+.map-pick:hover, .no-geom button:hover, .map-pick.on, .no-geom button.on { background: var(--ink); color: var(--paper); }
+.no-geom { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.no-geom .head { font: 600 0.75rem/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding: 0.7rem 0 0.4rem; }
+.no-geom li { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; margin-bottom: 0.4rem; }
+.no-geom span { font-size: 0.8rem; color: var(--ink-3); }
+.place-sheet { background: var(--card); border: 1px solid var(--rule); border-left: 6px solid var(--ink); padding: 1.1rem 1.2rem 1.2rem; }
+.place-sheet[hidden] { display: none; }
+.place-sheet h3 { font: 600 1.5rem/1.15 var(--serif); margin: 0.35rem 0 0.4rem; }
+.place-sheet .out { font-weight: 600; margin: 0 0 0.6rem; }
+.place-sheet .cta { margin: 1rem 0 0; }
+
 /* ---------- backtest and payouts ---------- */
 .downloads { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--rule-strong); max-width: 60rem; }
 .downloads li { display: grid; grid-template-columns: 12rem minmax(0, 1fr); gap: 0.4rem 1.25rem; padding: 0.8rem 0; border-bottom: 1px solid var(--rule); }
@@ -459,6 +484,7 @@ table.grants th[scope="row"] { font-weight: 600; }
   /* Label above value, so long ids get the full width instead of a sliver. */
   .panel dl, .sigrow dl, .evidence dl, .ids, .checks, dl.stake { grid-template-columns: minmax(0, 1fr); gap: 0.1rem 0; }
   table.stakeholders { display: block; overflow-x: auto; }
+  .map-split { grid-template-columns: 1fr; }
   .panel dd, .sigrow dd, .ids dd, .checks dd { margin-bottom: 0.6rem; }
 }
 /* Nothing may push the page wider than the screen. */
