@@ -428,8 +428,8 @@ dl.stake dd { margin: 0; }
 .farmer-a { font: 600 1.35rem/1.25 var(--serif); margin: 0 0 0.7rem; color: var(--ink); }
 .farmer p { font-size: 1.05rem; }
 
-.map-split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr); gap: 1.5rem; align-items: start; }
-.basin { width: 100%; height: auto; background: var(--card); border: 1px solid var(--rule); }
+.map-split { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+.basin { width: 100%; max-width: 36rem; height: auto; background: var(--card); border: 1px solid var(--rule); }
 .basin .box { cursor: pointer; }
 .basin .box rect { fill: rgba(20, 32, 28, 0.08); stroke: var(--ink); stroke-width: 1.5; }
 .basin .box.signed rect { fill: rgba(15, 85, 96, 0.55); }
@@ -447,11 +447,16 @@ dl.stake dd { margin: 0; }
 .no-geom .head { font: 600 0.75rem/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); padding: 0.7rem 0 0.4rem; }
 .no-geom li { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; margin-bottom: 0.4rem; }
 .no-geom span { font-size: 0.8rem; color: var(--ink-3); }
-.place-sheet { background: var(--card); border: 1px solid var(--rule); border-left: 6px solid var(--ink); padding: 1.1rem 1.2rem 1.2rem; }
+.place-sheet { background: var(--card); border: 1px solid var(--rule); border-left: 6px solid var(--ink); padding: 1.35rem 1.5rem 1.5rem; max-width: 46rem; }
 .place-sheet[hidden] { display: none; }
-.place-sheet h3 { font: 600 1.5rem/1.15 var(--serif); margin: 0.35rem 0 0.4rem; }
-.place-sheet .out { font-weight: 600; margin: 0 0 0.6rem; }
-.place-sheet .cta { margin: 1rem 0 0; }
+.place-sheet h3 { font: 600 1.7rem/1.15 var(--serif); margin: 0.35rem 0 0.4rem; }
+.place-sheet .out { font-weight: 600; margin: 0 0 0.45rem; }
+.place-sheet > p { max-width: 42rem; }
+.place-sheet .cta { margin: 1.15rem 0 0; }
+.sheet-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); gap: 1rem 1.5rem; margin: 1.15rem 0 0; padding-top: 1rem; border-top: 1px solid var(--rule); }
+.sheet-stats .k { display: block; font: 600 0.6875rem/1.2 var(--sans); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 0.25rem; }
+.sheet-stats b { font: 600 1.1rem/1.3 var(--serif); }
+.sheet-stats .live { font-weight: 600; }
 
 /* ---------- backtest and payouts ---------- */
 .downloads { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--rule-strong); max-width: 60rem; }
@@ -484,7 +489,6 @@ table.grants th[scope="row"] { font-weight: 600; }
   /* Label above value, so long ids get the full width instead of a sliver. */
   .panel dl, .sigrow dl, .evidence dl, .ids, .checks, dl.stake { grid-template-columns: minmax(0, 1fr); gap: 0.1rem 0; }
   table.stakeholders { display: block; overflow-x: auto; }
-  .map-split { grid-template-columns: 1fr; }
   .panel dd, .sigrow dd, .ids dd, .checks dd { margin-bottom: 0.6rem; }
 }
 /* Nothing may push the page wider than the screen. */

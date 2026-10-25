@@ -96,10 +96,15 @@ def render_basin_map(places: list[dict], boxes: dict) -> str:
         x1, y1 = project(box["west"], box["north"], extent)
         x2, y2 = project(box["east"], box["south"], extent)
         kind = "signed" if p["decision"] == "yes" else "no"
-        lx, ly = (x1 + x2) / 2, (y1 + y2) / 2
+        left, top = min(x1, x2), min(y1, y2)
+        width, height = abs(x2 - x1), abs(y2 - y1)
+        lx, ly = left + width / 2, top + height / 2
+        # Ahero sits on top of Kobura; put its name under the box so the two do not collide.
+        if slug == "ahero":
+            ly = top + height + 16
         drawn.append(
             f'<g class="box {kind}" data-pick="{slug}" tabindex="0" role="button" aria-pressed="false" aria-label="{escape(p["name"])}">'
-            f'<rect x="{min(x1, x2):.1f}" y="{min(y1, y2):.1f}" width="{abs(x2 - x1):.1f}" height="{abs(y2 - y1):.1f}"/>'
+            f'<rect x="{left:.1f}" y="{top:.1f}" width="{width:.1f}" height="{height:.1f}"/>'
             f'<text x="{lx:.1f}" y="{ly:.1f}">{escape(MAP_SHORT[slug])}</text></g>'
         )
     nameless = [p for p in places if p["slug"] not in boxes]
@@ -123,37 +128,62 @@ def render_basin_map(places: list[dict], boxes: dict) -> str:
 </div>"""
 
 
-def render_place_sheets(places: list[dict], build, deployment) -> str:
+def _short_why(p: dict, modeled: bool) -> str:
+    if modeled:
+        return "Both sources signed. A claim is on the testnet."
+    if p["decision"] == "abstain":
+        return "No outline we would stand behind. Not a missing satellite pass, and not “no flood”."
+    return "Rainfall signed. Radar did not. This rule misses a reported flood."
+
+
+def render_place_sheets(places: list[dict], build, deployment, flavor: str = "reinsurer") -> str:
     g = groups(places)
     modeled_slugs = {x["slug"] for x in g["modeled"]}
     sheets = []
     for p in places:
         v = vuln.row_for(p["slug"])
-        marker, outcome, why = build.verdict(p)
-        frac = build.pct(p["fraction"]) if p["fraction"] is not None else "not measured"
-        hh = v["households_note"] or "No household count printed"
-        parametric = f"{GRANT_ETH} ETH grant" if p["slug"] in modeled_slugs else "No claim opens. Rainfall alone cannot pay."
+        marker, outcome, _ = build.verdict(p)
+        modeled = p["slug"] in modeled_slugs
+        frac = build.pct(p["fraction"]) if p["fraction"] is not None else "Not measured"
         hidden = "" if p["slug"] == "kabonyo-kanyagwal" else " hidden"
+        if flavor == "insurer":
+            rule = "Would open a claim" if modeled else ("Rainfall only — no claim" if p["decision"] == "no" else "Cannot assess")
+            stats = f"""<div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>{escape(rule)}</b></div>
+    <div><span class="k">Radar</span><b>{escape(frac)}</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="{p['slug']}"><span class="snap">{escape(build.snapshot_text(p['slug'], deployment))}</span></b></div>
+  </div>"""
+            cta = f'<a class="btn primary" href="{p["page"]}">{"Challenge or finalize" if modeled else "See the evidence"}</a>'
+        else:
+            stats = f"""<div class="sheet-stats">
+    <div><span class="k">Radar</span><b>{escape(frac)}</b></div>
+    <div><span class="k">Depth</span><b>{v['depth_m']:.1f} m</b> <span class="prov {v['depth_provenance']}">{escape(v['depth_provenance'])}</span></div>
+    <div><span class="k">Class</span><b>{escape(v['class_label'])}</b> <span class="prov assumption">assumption</span></div>
+    <div><span class="k">TIV</span><b>{vuln.kes(v['tiv_kes'])}</b></div>
+    <div><span class="k">Ground-up</span><b>{vuln.kes(v['ground_up_kes'])}</b></div>
+    <div><span class="k">Parametric</span><b>{"0.001 ETH" if modeled else "No claim"}</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="{p['slug']}"><span class="snap">{escape(build.snapshot_text(p['slug'], deployment))}</span></b></div>
+  </div>"""
+            cta = f'<a class="btn" href="{p["page"]}">Open the claim page</a>'
         sheets.append(
             f"""<article class="place-sheet" data-sheet="{p['slug']}"{hidden}>
   <p class="who-tag">{escape(p['scale'])}</p>
   <h3>{escape(p['name'])}</h3>
   <p class="out"><span class="dot {marker}"></span>{escape(outcome)}</p>
-  <p>{escape(why)}</p>
-  <dl class="stake">
-    <dt>Radar</dt><dd>{escape(frac)} of land pixels · {build.sign_word(p['decision'])}</dd>
-    <dt>Rainfall</dt><dd>{build.sign_word(p['rain'])} · one catchment reading for the week</dd>
-    <dt>Depth</dt><dd>{v['depth_m']:.1f} m <span class="prov {v['depth_provenance']}">{escape(v['depth_provenance'])}</span></dd>
-    <dt>Class</dt><dd>{escape(v['class_label'])} <span class="prov assumption">assumption</span></dd>
-    <dt>Households / TIV</dt><dd>{escape(hh)} · {vuln.kes(v['tiv_kes'])}</dd>
-    <dt>Damage ratio / ground-up</dt><dd>{v['damage_ratio']:.2f} of TIV · {vuln.kes(v['ground_up_kes'])}</dd>
-    <dt>Parametric</dt><dd>{escape(parametric)}</dd>
-    <dt>On the testnet</dt><dd class="live" data-live-zone="{p['slug']}"><span class="snap">{escape(build.snapshot_text(p['slug'], deployment))}</span></dd>
-  </dl>
-  <p class="cta"><a class="btn" href="{p['page']}">Open the claim page</a></p>
+  <p>{escape(_short_why(p, modeled))}</p>
+  {stats}
+  <p class="cta">{cta}</p>
 </article>"""
         )
     return "".join(sheets)
+
+
+def render_place_picker(places: list[dict], build, deployment, flavor: str) -> str:
+    return f"""<div class="map-split">
+    {render_basin_map(places, load_boxes(build.ROOT))}
+    <div class="sheet-host">{render_place_sheets(places, build, deployment, flavor)}</div>
+  </div>"""
 
 
 def render_all(build, places, counts, deployment) -> dict[str, str]:
@@ -250,6 +280,11 @@ def page_insurer(build, places, counts, deployment) -> str:
   <p class="lede">That gap is the basis-risk record. Rainfall signed everywhere because it is read once, on the upstream catchment. Radar looks at each place. Use the disagreement to defend a stricter trigger, or to argue the line is too high.</p>
   {build.live_bar()}
 </div></section>
+<section class="block tight" id="pick"><div class="wrap">
+  <div class="sec-head"><span class="num">00</span><h2>Pick a place</h2>
+  <p>Click a box, or a name. The sheet says whether a rainfall-only trigger would have paid, and whether this rule would.</p></div>
+  {render_place_picker(places, build, deployment, "insurer")}
+</div></section>
 <section class="block"><div class="wrap">
   <div class="sec-head"><span class="num">01</span><h2>What each rule would have done</h2>
   <p>Same seven places, same week, three rules. False triggers stay at zero because this log has no “did not flood” labels.</p></div>
@@ -337,17 +372,14 @@ def page_reinsurer(build, places, counts, deployment) -> str:
   <div class="facts">
     <div class="fact"><span class="n">{modeled_n}</span><span class="k">place the rule modeled as a loss</span></div>
     <div class="fact"><span class="n rain">{unmodeled_n}</span><span class="k">reported floods left unmodeled</span></div>
-    <div class="fact"><span class="n radar">{grant_sum(modeled_n)}</span><span class="k">ETH modeled · {grant_sum(rain_n)} ETH if the trigger were rainfall only. Demo amounts, not sums insured.</span></div>
+    <div class="fact"><span class="n radar">{grant_sum(modeled_n)}</span><span class="k">ETH on this rule. Rainfall-only would be {grant_sum(rain_n)}. Demo amounts.</span></div>
   </div>
 </div></section>
 
 <section class="block tight" id="pick"><div class="wrap">
   <div class="sec-head"><span class="num">00</span><h2>Pick a place</h2>
   <p>Click a box, or a name. The sheet is that place’s hazard, book, damage and live claim. Three names have no outline, so they are not drawn.</p></div>
-  <div class="map-split">
-    {render_basin_map(places, load_boxes(build.ROOT))}
-    <div class="sheet-host">{render_place_sheets(places, build, deployment)}</div>
-  </div>
+  {render_place_picker(places, build, deployment, "reinsurer")}
 </div></section>
 
 <section class="block" id="hazard"><div class="wrap">

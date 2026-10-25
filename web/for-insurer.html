@@ -25,6 +25,105 @@
   <p class="lede">That gap is the basis-risk record. Rainfall signed everywhere because it is read once, on the upstream catchment. Radar looks at each place. Use the disagreement to defend a stricter trigger, or to argue the line is too high.</p>
   <div class="livebar"><p class="live-status wait" data-live-status>Reading the Sepolia contracts… Without scripting this page shows the snapshot taken at deploy time.</p><button class="btn small" type="button" data-refresh>Refresh</button></div>
 </div></section>
+<section class="block tight" id="pick"><div class="wrap">
+  <div class="sec-head"><span class="num">00</span><h2>Pick a place</h2>
+  <p>Click a box, or a name. The sheet says whether a rainfall-only trigger would have paid, and whether this rule would.</p></div>
+  <div class="map-split">
+    <div class="map-pane" data-place-map>
+  <svg class="basin" viewBox="0 0 640 520" role="img" aria-label="Working boxes for the four places that have an OpenStreetMap outline">
+    <g class="box signed" data-pick="kabonyo-kanyagwal" tabindex="0" role="button" aria-pressed="false" aria-label="Kabonyo Kanyagwal"><rect x="71.8" y="233.0" width="283.0" height="248.2"/><text x="213.3" y="357.1">Kabonyo</text></g><g class="box no" data-pick="ombeyi" tabindex="0" role="button" aria-pressed="false" aria-label="Ombeyi"><rect x="264.2" y="38.8" width="324.8" height="196.4"/><text x="426.6" y="137.0">Ombeyi</text></g><g class="box no" data-pick="kobura" tabindex="0" role="button" aria-pressed="false" aria-label="Kobura"><rect x="51.0" y="133.2" width="344.4" height="173.9"/><text x="223.2" y="220.2">Kobura</text></g><g class="box no" data-pick="ahero" tabindex="0" role="button" aria-pressed="false" aria-label="Ahero"><rect x="349.5" y="182.7" width="137.6" height="104.9"/><text x="418.3" y="303.6">Ahero</text></g>
+  </svg>
+  <p class="map-key"><span class="sw radar"></span>Radar signed <span class="sw line"></span>Radar did not sign. Boxes overlap because they are ward extents, not flood outlines.</p>
+  <div class="map-picks"><button type="button" class="map-pick" data-pick="kabonyo-kanyagwal" aria-pressed="false">Kabonyo Kanyagwal</button><button type="button" class="map-pick" data-pick="kobura" aria-pressed="false">Kobura</button><button type="button" class="map-pick" data-pick="ahero" aria-pressed="false">Ahero</button><button type="button" class="map-pick" data-pick="ombeyi" aria-pressed="false">Ombeyi</button></div>
+  <ul class="no-geom"><li class="head">Named, no outline</li><li><button type="button" data-pick="kakola-ombaka" aria-pressed="false">Kakola Ombaka</button><span>No outline. Not drawn.</span></li><li><button type="button" data-pick="nyamasao" aria-pressed="false">Nyamasao</button><span>No outline. Not drawn.</span></li><li><button type="button" data-pick="kadibo" aria-pressed="false">Kadibo</button><span>No outline. Not drawn.</span></li></ul>
+</div>
+    <div class="sheet-host"><article class="place-sheet" data-sheet="kabonyo-kanyagwal">
+  <p class="who-tag">Ward</p>
+  <h3>Kabonyo Kanyagwal</h3>
+  <p class="out"><span class="dot signed"></span>Claim opens</p>
+  <p>Both sources signed. A claim is on the testnet.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Would open a claim</b></div>
+    <div><span class="k">Radar</span><b>8.9%</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="kabonyo-kanyagwal"><span class="snap">At deploy: both required sources signed, challenge window opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-kabonyo-kanyagwal.html">Challenge or finalize</a></p>
+</article><article class="place-sheet" data-sheet="kobura" hidden>
+  <p class="who-tag">Ward box; the report said village</p>
+  <h3>Kobura</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Rainfall only — no claim</b></div>
+    <div><span class="k">Radar</span><b>0.9%</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="kobura"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-kobura.html">See the evidence</a></p>
+</article><article class="place-sheet" data-sheet="ahero" hidden>
+  <p class="who-tag">Town, 3 km box around the town point</p>
+  <h3>Ahero</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Rainfall only — no claim</b></div>
+    <div><span class="k">Radar</span><b>0.7%</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="ahero"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-ahero.html">See the evidence</a></p>
+</article><article class="place-sheet" data-sheet="ombeyi" hidden>
+  <p class="who-tag">Location, measured on the ward box</p>
+  <h3>Ombeyi</h3>
+  <p class="out"><span class="dot no"></span>No claim opens</p>
+  <p>Rainfall signed. Radar did not. This rule misses a reported flood.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Rainfall only — no claim</b></div>
+    <div><span class="k">Radar</span><b>0.3%</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="ombeyi"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-ombeyi.html">See the evidence</a></p>
+</article><article class="place-sheet" data-sheet="kakola-ombaka" hidden>
+  <p class="who-tag">Named area, no outline found</p>
+  <h3>Kakola Ombaka</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Cannot assess</b></div>
+    <div><span class="k">Radar</span><b>Not measured</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="kakola-ombaka"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-kakola-ombaka.html">See the evidence</a></p>
+</article><article class="place-sheet" data-sheet="nyamasao" hidden>
+  <p class="who-tag">Dispensary, no outline found</p>
+  <h3>Nyamasao</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Cannot assess</b></div>
+    <div><span class="k">Radar</span><b>Not measured</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="nyamasao"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-nyamasao.html">See the evidence</a></p>
+</article><article class="place-sheet" data-sheet="kadibo" hidden>
+  <p class="who-tag">Sub-county, no outline found</p>
+  <h3>Kadibo</h3>
+  <p class="out"><span class="dot na"></span>Cannot assess</p>
+  <p>No outline we would stand behind. Not a missing satellite pass, and not “no flood”.</p>
+  <div class="sheet-stats">
+    <div><span class="k">Rainfall trigger</span><b>Would have paid</b></div>
+    <div><span class="k">This rule</span><b>Cannot assess</b></div>
+    <div><span class="k">Radar</span><b>Not measured</b></div>
+    <div><span class="k">On the testnet</span><b class="live" data-live-zone="kadibo"><span class="snap">At deploy: no claim opened</span></b></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="claim-kadibo.html">See the evidence</a></p>
+</article></div>
+  </div>
+</div></section>
 <section class="block"><div class="wrap">
   <div class="sec-head"><span class="num">01</span><h2>What each rule would have done</h2>
   <p>Same seven places, same week, three rules. False triggers stay at zero because this log has no “did not flood” labels.</p></div>

@@ -62,6 +62,14 @@ class SiteTests(unittest.TestCase):
         self.assertIn("No outline. Not drawn.", html)
         self.assertIn('id="pick"', html)
 
+    def test_insurer_page_has_the_same_place_picker(self) -> None:
+        html = self.pages["for-insurer.html"]
+        self.assertIn('id="pick"', html)
+        self.assertIn("Rainfall trigger", html)
+        self.assertIn("Would have paid", html)
+        for slug in build.PLACES:
+            self.assertIn(f'data-sheet="{slug}"', html)
+
     def test_reinsurer_damage_function_is_labelled_not_measured(self) -> None:
         html = self.pages["for-reinsurer.html"]
         self.assertIn("waist-high", html)
