@@ -52,6 +52,15 @@ class SiteTests(unittest.TestCase):
         self.assertNotRegex(html, r"(?i)\bprobable maximum loss\b.*\d")
         self.assertNotRegex(html, r"(?i)\breturn period of\b")
 
+    def test_reinsurer_damage_function_is_labelled_not_measured(self) -> None:
+        html = self.pages["for-reinsurer.html"]
+        self.assertIn("waist-high", html)
+        self.assertIn("adapted", html)
+        self.assertIn("assumption", html)
+        self.assertIn("not a measured flood-depth map", html)
+        self.assertIn("Radar open-water fraction is not depth", html)
+        self.assertIn("id=\"vulnerability\"", html)
+
     def test_internal_links_resolve(self) -> None:
         """Every local href and src points at a page or file that exists, and every #fragment exists."""
         pattern = re.compile(r'(?:href|src)="([^"]+)"')

@@ -390,6 +390,13 @@ dl.stake dd { margin: 0; }
 .layer h3 { font: 600 1.05rem/1.2 var(--serif); margin: 0 0 0.4rem; }
 .layer p { margin: 0; color: var(--ink-2); font-size: 0.95rem; }
 .n-lg { font: 600 2.2rem/1 var(--serif); color: var(--ink) !important; margin: 0.2rem 0 0.5rem !important; }
+.prov {
+  display: inline-block; font: 600 0.625rem/1 var(--sans); letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 0.15rem 0.3rem; vertical-align: middle; margin-left: 0.25rem;
+}
+.prov.researched { background: var(--ink); color: var(--paper); }
+.prov.adapted { background: var(--radar); color: #fff; }
+.prov.assumption { border: 1px solid var(--ink-3); color: var(--ink-3); }
 .lossbars { list-style: none; margin: 0; padding: 0; max-width: 52rem; }
 .lossbars li { margin: 0 0 1.15rem; }
 .lb-lab { display: block; font: 600 0.95rem/1.3 var(--serif); margin-bottom: 0.35rem; }

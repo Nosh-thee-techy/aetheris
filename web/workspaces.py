@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from html import escape
 
+from backtest.pipeline import damage as vuln
+
 # Demo grant per place, the same value contracts/tools/deploy_testnet.mjs posts.
 GRANT_ETH = 0.001
 
@@ -84,7 +86,7 @@ def page_hub(build, places) -> str:
          "See what rainfall-only would have paid, what this rule paid, and challenge the live claim.",
          f"{len(g['rainfall'])} rainfall-only · {len(g['modeled'])} opened"),
         ("for-reinsurer.html", "Reinsurer", "Event loss",
-         "A layered footprint of one named flood: hazard, demo exposure, modeled loss, unmodeled residual.",
+         "A layered footprint of one named flood: hazard, stand-in TIV, JRC-adapted damage, parametric grant.",
          f"{grant_sum(len(g['modeled']))} ETH modeled · {grant_sum(len(g['radar_no']) + len(g['unassessed']))} ETH unmodeled"),
         ("for-responder.html", "Disaster responder", "Second signal",
          "Act where radar also signed. Hold where only rainfall signed. Do not invent a reading where we could not look.",
@@ -205,6 +207,23 @@ def page_reinsurer(build, places, counts, deployment) -> str:
             f"<td class='n'>{grant_sum(1)} ETH</td></tr>"
         )
     live_claim = g["modeled"][0]["page"] if g["modeled"] else "claims.html"
+    vrows = {r["slug"]: r for r in vuln.book()}
+    vtot = vuln.totals()
+    vul_rows = []
+    for p in places:
+        r = vrows[p["slug"]]
+        hh = r["households_note"] or "No household count printed"
+        tiv = vuln.kes(r["tiv_kes"])
+        gu = vuln.kes(r["ground_up_kes"])
+        vul_rows.append(
+            f"<tr><th scope='row'>{escape(p['name'])}</th>"
+            f"<td>{r['depth_m']:.1f} m <span class='prov {r['depth_provenance']}'>{escape(r['depth_provenance'])}</span></td>"
+            f"<td>{escape(r['class_label'])} <span class='prov assumption'>assumption</span></td>"
+            f"<td>{escape(hh)}</td>"
+            f"<td class='n'>{tiv}</td>"
+            f"<td class='n'>{r['damage_ratio']:.2f}</td>"
+            f"<td class='n'>{gu}</td></tr>"
+        )
     return f"""<section class="page-head"><div class="wrap">
   {workspace_nav("reinsurer")}
   <p class="eyebrow">Reinsurer workspace · event loss</p>
@@ -242,29 +261,56 @@ def page_reinsurer(build, places, counts, deployment) -> str:
 
 <section class="block alt" id="exposure"><div class="wrap">
   <div class="sec-head"><span class="num">02</span><h2>Exposure</h2>
-  <p>Each place carries a demo grant of {GRANT_ETH} ETH, posted so the escrow can show a payout. The beneficiaries are placeholder addresses. A real treaty would load your own sums insured and your own recipients here.</p></div>
+  <p>Two books sit here. The escrow still holds a demo grant of {GRANT_ETH} ETH per place. Beside it, where a report printed a household count, we put a stand-in TIV so the damage curve has something to multiply.</p></div>
   <dl class="stake">
     <dt>Places in the book</dt><dd>{n}</dd>
-    <dt>Demo sum per place</dt><dd>{GRANT_ETH} ETH</dd>
-    <dt>Ground-up if every reported place paid</dt><dd>{grant_sum(n)} ETH · hypothetical, news reports are not a loss survey</dd>
-    <dt>Season end</dt><dd>Locked in the escrow. The funder cannot pull committed funds during the season.</dd>
+    <dt>Households named in the news</dt><dd>{vtot['households']} in {vtot['places_with_tiv']} places. The other four have no printed household count, so they have no TIV.</dd>
+    <dt>Stand-in TIV</dt><dd>{vuln.kes(vtot['tiv_kes'])} <span class="prov adapted">adapted</span> · {vtot['households']} × KES 153,500. That unit is the <a href="{vuln.UNIT_TIV_SOURCE['url']}">UNHCR Kenya standard shelter grant</a>, a Kakuma/Kalobeyei figure, not a Nyando rebuild survey.</dd>
+    <dt>Demo grant on the testnet</dt><dd>{GRANT_ETH} ETH per place, placeholders. A real treaty loads your own sums insured.</dd>
   </dl>
 </div></section>
 
-<section class="block" id="loss"><div class="wrap">
-  <div class="sec-head"><span class="num">03</span><h2>Loss</h2>
-  <p>Three ways to count the same week. The bars are counts of places, not a return period.</p></div>
+<section class="block" id="vulnerability"><div class="wrap">
+  <div class="sec-head"><span class="num">03</span><h2>Vulnerability · the damage function</h2>
+  <p>Depth × a JRC curve for a housing class → damage ratio → ratio × TIV. Radar open-water fraction is not depth and is not used here.</p></div>
+  <div class="layers">
+    <div class="layer">
+      <h3>Depth proxy</h3>
+      <p class="n-lg">{vuln.WAIST_M} m</p>
+      <p><span class="prov adapted">adapted</span> at Ahero: “{escape(vuln.WAIST_SOURCE['words'])}”, {escape(vuln.WAIST_SOURCE['who'])}, <a href="{vuln.WAIST_SOURCE['url']}">{escape(vuln.WAIST_SOURCE['outlet'])}</a>. Waist-high is taken as {vuln.WAIST_M} m. <span class="prov assumption">assumption</span> at the other six places: the same river, the same week, no local depth, so Ahero’s number is borrowed. This is not a measured flood-depth map.</p>
+    </div>
+    <div class="layer">
+      <h3>Curves</h3>
+      <p class="n-lg">JRC 2017</p>
+      <p><span class="prov adapted">adapted</span> from Huizinga et al., <a href="https://doi.org/10.2760/16510">Global flood depth-damage functions</a>, as transcribed in the Nairobi Urban Flood CAT spec. Ahero uses Africa residential (town fabric). The others use a blend of Africa residential and weak structure (semi-permanent rural housing). We did not re-read the JRC spreadsheet.</p>
+    </div>
+  </div>
+  <div class="matrix-wrap gap-l"><div>
+  <table class="grants"><caption>Indicative damage at {vuln.WAIST_M} m. Damage ratio is a fraction of TIV, not an accuracy figure.</caption>
+    <thead><tr>
+      <th scope="col">Place</th><th scope="col">Depth</th><th scope="col">Class</th>
+      <th scope="col">Households</th><th class="n" scope="col">TIV</th>
+      <th class="n" scope="col">Ratio</th><th class="n" scope="col">Ground-up</th>
+    </tr></thead>
+    <tbody>{"".join(vul_rows)}</tbody>
+  </table></div></div>
+  <p class="note">Sensitivity, same three places that have a TIV: at 0.5 m the ground-up is {vuln.kes(vtot['sensitivity'][0.5]['ground_up_kes'])}; at 0.9 m, {vuln.kes(vtot['ground_up_kes'])}; at 1.5 m, {vuln.kes(vtot['sensitivity'][1.5]['ground_up_kes'])}. We do not use the 3–5 m figure from a broader Kisumu KRCS quote, because the same quote also says knee-deep and waist-high.</p>
+</div></section>
+
+<section class="block alt" id="loss"><div class="wrap">
+  <div class="sec-head"><span class="num">04</span><h2>Loss</h2>
+  <p>The parametric grant and the JRC-adapted ground-up are not the same quantity. One is a testnet trigger. The other is an indicative building loss on the three places that have a household count.</p></div>
   <ol class="lossbars">
-    <li><span class="lb-lab">If every reported place paid</span><span class="lb-bar" style="width:100%"><span>{n} places · {grant_sum(n)} ETH</span></span><span class="lb-note">Hypothetical. Reports are not claims.</span></li>
+    <li><span class="lb-lab">JRC-adapted ground-up at {vuln.WAIST_M} m</span><span class="lb-bar" style="width:100%"><span>{vuln.kes(vtot['ground_up_kes'])} · {vtot['places_with_tiv']} places with a TIV</span></span><span class="lb-note">Adapted curves, assumed depth outside Ahero, adapted shelter grant. Not a loss survey.</span></li>
     <li><span class="lb-lab">Rainfall-only trigger</span><span class="lb-bar rain" style="width:100%"><span>{rain_n} places · {grant_sum(rain_n)} ETH</span></span><span class="lb-note">Would have fired everywhere. No “did not flood” labels, so no false-alarm count.</span></li>
-    <li><span class="lb-lab">This rule · radar and rainfall</span><span class="lb-bar radar" style="width:{modeled_w:.1f}%"><span>{modeled_n} place · {grant_sum(modeled_n)} ETH</span></span><span class="lb-note">The modeled loss. On the testnet as one claim.</span></li>
+    <li><span class="lb-lab">This rule · radar and rainfall</span><span class="lb-bar radar" style="width:{modeled_w:.1f}%"><span>{modeled_n} place · {grant_sum(modeled_n)} ETH</span></span><span class="lb-note">The parametric payout. On the testnet as one claim.</span></li>
   </ol>
   <p class="note">Live claim state is read from Sepolia. <span class="live" data-live-zone="{g['modeled'][0]['slug'] if g['modeled'] else ''}"><span class="snap">Reading…</span></span></p>
   <p class="cta"><a class="btn" href="{live_claim}">Open the modeled claim</a></p>
 </div></section>
 
-<section class="block alt" id="unmodeled"><div class="wrap">
-  <div class="sec-head"><span class="num">04</span><h2>Unmodeled residual</h2>
+<section class="block" id="unmodeled"><div class="wrap">
+  <div class="sec-head"><span class="num">05</span><h2>Unmodeled residual</h2>
   <p>In a cat model this is the layer the catalogue missed. Here it is the {unmodeled_n} reported floods the rule did not open. We do not turn that into a return period.</p></div>
   <div class="matrix-wrap"><div>
   <table class="grants"><caption>Reported floods the rule left unmodeled, {grant_sum(unmodeled_n)} ETH of demo exposure</caption>
@@ -274,14 +320,14 @@ def page_reinsurer(build, places, counts, deployment) -> str:
   <p class="note">Radar sees open water. Flooding under crops, trees or buildings is invisible to it. A ward box mixes dry and wet land and pulls the fraction down. Three names had no outline we would measure rather than guess.</p>
 </div></section>
 
-<section class="block" id="not-a-model"><div class="wrap">
-  <div class="sec-head"><span class="num">05</span><h2>What a catastrophe model still has to do</h2>
+<section class="block alt" id="not-a-model"><div class="wrap">
+  <div class="sec-head"><span class="num">06</span><h2>What a catastrophe model still has to do</h2>
   <p>This page is the event you would feed the model. It is not the model.</p></div>
   <ul class="limits">
+    <li><b>No measured flood-depth map.</b><span>One reported “waist-high” at Ahero, converted to {vuln.WAIST_M} m. Radar fraction is still not depth.</span></li>
     <li><b>No stochastic catalogue.</b><span>One week. No average annual loss, no occurrence or aggregate exceedance curve, no probable maximum loss, no return period.</span></li>
-    <li><b>No vulnerability function.</b><span>We do not convert open-water fraction into damage. The payout is a binary grant.</span></li>
-    <li><b>No real exposure file.</b><span>{GRANT_ETH} ETH per place is a demo so the escrow can move. Load your own sums insured.</span></li>
-    <li><b>News is not ground-up loss.</b><span>The seven names are places reporters reached. Unknown is not “no flood”.</span></li>
+    <li><b>TIV is a stand-in.</b><span>Households × a Kakuma shelter grant. Load your own sums insured. Four places have no TIV at all.</span></li>
+    <li><b>News is not a loss survey.</b><span>The seven names are places reporters reached. Unknown is not “no flood”.</span></li>
   </ul>
 </div></section>"""
 
