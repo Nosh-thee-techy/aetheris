@@ -136,7 +136,7 @@ forge test --root contracts
 Backtest tests use the Python standard library:
 
 ```powershell
-python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror web.test_build
+python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror web.test_build web.test_server
 python -m backtest.score
 ```
 
@@ -145,11 +145,17 @@ python -m backtest.score
 ### The site
 
 ```powershell
-python web/build.py        # writes the pages, chain-config.js and web/data/
-start web/index.html       # opens from disk; no server needed
+cd app
+npm install
+npm run build              # writes web/spa — landing, enter, desks
+cd ..
+python web/build.py        # writes method, claims, backtest and chain-config.js
+python web/server.py       # http://127.0.0.1:8765/
 ```
 
-Pages: Overview, Claims (which ends with the payout escrow and withdrawals), one page per place, Backtest, and a workspace for each stakeholder (insurer, reinsurer event-loss, responder, data, research, farmer view). The reinsurer page is one named event layered like a catastrophe model. It is not a stochastic catalogue. Vulnerability is an indicative JRC depth-damage layer: waist-high at Ahero, converted to 0.9 m, labelled adapted or assumption. Radar fraction is not used as depth. `build.py` computes the claim ids and evidence hashes and **fails the build** if they disagree with `web/data/deployment.json`. `app.js` reads Sepolia in the browser and holds no keys. Writes (challenge, finalize, release, withdraw) go through the visitor's own wallet. The only library is a vendored copy of ethers 6.17.0 in `web/vendor/`. Nothing loads from a CDN.
+Open [http://127.0.0.1:8765/](http://127.0.0.1:8765/). The whole visitor site is a Vite app: landing, enter, method, claims, backtest, and the desks. Enter is a labelled gate: pick a role, no password, no accounts, no machine learning. Old `.html` addresses still open the same pages. `GET /api/desk` is readable without a session. The API repeats the same CSVs the generator already uses. It does not invent radar yes/no. Chain state on the claims pages is the deploy snapshot, labelled as a snapshot. `GET /api/me` is `200` with `{ok:false}` when nobody has entered.
+
+Pages: Home, Enter, Method, Claims (which ends with the payout escrow and withdrawals), one page per place, Backtest, and a desk for each stakeholder (insurer, reinsurer event-loss, responder, data desk, research, farmer view). The reinsurer page is one named event layered like a catastrophe model. It is not a stochastic catalogue. Vulnerability is an indicative JRC depth-damage layer: waist-high at Ahero, converted to 0.9 m, labelled adapted or assumption. Radar fraction is not used as depth. `build.py` computes the claim ids and evidence hashes and **fails the build** if they disagree with `web/data/deployment.json`. `app.js` reads Sepolia in the browser and holds no keys. Writes (challenge, finalize, release, withdraw) go through the visitor's own wallet. The only library is a vendored copy of ethers 6.17.0 in `web/vendor/`. Nothing loads from a CDN.
 
 ### The contract tools
 

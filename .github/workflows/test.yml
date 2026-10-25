@@ -12,7 +12,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m unittest backtest.test_score backtest.pipeline.test_pipeline backtest.pipeline.test_damage watcher.test_mirror web.test_build
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci && npm run build
+        working-directory: app
+      - run: python -m unittest backtest.test_score backtest.pipeline.test_pipeline backtest.pipeline.test_damage watcher.test_mirror web.test_build web.test_server
 
   contract:
     runs-on: ubuntu-latest
