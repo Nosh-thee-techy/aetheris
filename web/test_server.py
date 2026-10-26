@@ -41,6 +41,9 @@ class DeskTests(unittest.TestCase):
         self.assertEqual(kabonyo["outcome"], "Claim opens")
         self.assertTrue(kabonyo["claim_id"].startswith("0x"))
         self.assertEqual(payload["counts"]["rules"]["radar_plus_rainfall"]["hits"], 1)
+        self.assertEqual(payload["counts"]["misses"]["below_threshold"], 3)
+        self.assertEqual(payload["counts"]["misses"]["no_geometry"], 3)
+        self.assertEqual(payload["counts"]["misses"]["no_scene"], 0)
         self.assertEqual(payload["chain"]["chain_id"], 11155111)
 
     def test_known_desks_have_homes(self):

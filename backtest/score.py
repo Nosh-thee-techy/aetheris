@@ -308,7 +308,7 @@ def normalize_label_rows(rows: list[dict[str, str]]) -> list[dict[str, str]]:
 
 
 def write_results(result: dict, path: Path) -> None:
-    """Write the count table. One row per rule, then the agreement buckets."""
+    """Write the count table: rules, agreement, and every miss reason."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
@@ -331,16 +331,18 @@ def write_results(result: dict, path: Path) -> None:
             writer.writerow(
                 {"table": "agreement", "name": name, "hits": "", "misses": "", "false_triggers": "", "count": count}
             )
-        writer.writerow(
-            {
-                "table": "miss",
-                "name": "no_scene",
-                "hits": "",
-                "misses": result["misses"]["no_scene"],
-                "false_triggers": "",
-                "count": result["misses"]["no_scene"],
-            }
-        )
+        for name in MISS_BUCKETS:
+            count = result["misses"][name]
+            writer.writerow(
+                {
+                    "table": "miss",
+                    "name": name,
+                    "hits": "",
+                    "misses": count,
+                    "false_triggers": "",
+                    "count": count,
+                }
+            )
 
 
 def score_files(labels_path: Path, observations_path: Path) -> dict:

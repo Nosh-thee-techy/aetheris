@@ -9,8 +9,8 @@ const DESKS = [
   { id: "insurer", href: "/desk/insurer", who: "Insurer", title: "Pay or not", blurb: "What the rule said this week. Rain alone never pays." },
   { id: "reinsurer", href: "/desk/reinsurer", who: "Reinsurer", title: "This one flood", blurb: "One named event. Not a catalogue of years." },
   { id: "responder", href: "/desk/responder", who: "Responders / county", title: "Before funds or an alert", blurb: "A second instrument, and a record you can defend. Not the official forecast." },
-  { id: "research", href: "/desk/research", who: "Research", title: "The method", blurb: "Counts, the frozen rule, and the files. No machine learning." },
-  { id: "farmer", href: "/desk/farmer", who: "Smallholders", title: "The reason", blurb: "A checkable reason for each decision. A sandbox message if the demo releases a payout. They do not use this app." },
+  { id: "research", href: "/desk/research", who: "Research", title: "The finding", blurb: "Rain signed 7. The rule paid 1. Counts and miss reasons. Not a validation study." },
+  { id: "farmer", href: "/desk/farmer", who: "Smallholders", title: "The reason", blurb: "Yes, no, or we could not look. Not Kenya Met advice. They do not use this app." },
 ];
 
 const DESK_NAV = {
@@ -165,7 +165,7 @@ function landing() {
       <div class="hero-copy">
         <p class="eyebrow">Nyando basin, Kenya · 4–6 May 2024</p>
         <h1>Rain said flood in ${places.length} places. Radar agreed in ${radarYes}.</h1>
-        <p class="lede">After a flood, insurance and alerts often trust a rainfall number. That number can be wrong. Aetheris puts the rain number next to a radar picture of open water, for a named place, and writes down whether they agree. No machine learning. This is a demo. No real money moves.</p>
+        <p class="lede">We did not make the satellites true. We made disagreement visible. After a flood, insurance and alerts often trust a rainfall number. Aetheris puts that number next to a radar picture of open water, for a named place, and writes down whether they agree. No machine learning. This is a demo. No real money moves.</p>
         <div class="cta">
           <a class="btn primary" href="/enter">1. Enter as insurer</a>
           <a class="btn" href="/claim/kabonyo-kanyagwal">2. Open Kabonyo</a>
@@ -211,13 +211,14 @@ function landing() {
         <li><div><p class="n">${opened.length}</p><p>Both signed, so a claim may open${opened.length ? ` · ${esc(openedName)}` : ""}</p></div></li>
         <li><div><p class="n">${unknown}</p><p>We could not look. No outline, so no radar reading</p></div></li>
       </ul>
-      <p class="note">These are counts from the files. They are not an accuracy score. Three names had no outline we would measure, so radar was not run there.</p>
+      <p class="note">These are counts from the files. They are not an accuracy score. They do not prove the data is reliable, that anyone will use this, or that communities are better off. Three names had no outline we would measure, so radar was not run there. Rain would have paid ${rainYes}. This rule paid ${opened.length}. That is not “fewer missed floods.”</p>
       <ol class="steps walk">
         <li><b><a href="/enter">Enter as insurer.</a></b> Rain would have paid ${rainYes}. This rule paid ${opened.length}.</li>
         <li><b><a href="/claim/kabonyo-kanyagwal">Open Kabonyo-Kanyagwal.</a></b> The one place both sources signed. Read Sepolia. Challenge or finalize from your wallet.</li>
         <li><b><a href="/backtest">Open the backtest.</a></b> Agreements, disagreements, found, missed. False triggers stay 0: no “did not flood” labels.</li>
         <li><b><a href="/claims">Open claims and the escrow.</a></b> Testnet only. Pays once, after Finalized. No hand-release. M-PESA is SANDBOX.</li>
       </ol>
+      <p class="note">A later week is scored offline: scene → radar CSV → rainfall rows → <code>python -m backtest.week</code>. This page does not download a satellite scene. Leave the frozen rule unchanged.</p>
     </div></section>
     <section class="block"><div class="wrap">
       <div class="sec-head"><span class="num">03</span><h2>Pick who you are</h2></div>
@@ -227,8 +228,10 @@ function landing() {
     <section class="block alt"><div class="wrap">
       <div class="sec-head"><span class="num">04</span><h2>What this is not</h2></div>
       <ul class="limits">
-        <li><b>Not a forecast.</b><span>It is a check of one week that already happened.</span></li>
+        <li><b>Not a forecast.</b><span>It is a check of one week that already happened. It does not replace Kenya Met.</span></li>
         <li><b>Not an accuracy percentage.</b><span>Seven news reports cannot carry one. We publish counts.</span></li>
+        <li><b>Not a reliability proof.</b><span>Radar is the reference for this check, not ground truth. There is no gauge file here. We do not stub stations.</span></li>
+        <li><b>Not proof of use or impact.</b><span>We have not shown that anyone will adopt this, or that farmers are better off. The phone says yes, no, or we could not look.</span></li>
         <li><b>Not real money.</b><span>Testnet tokens. M-PESA is a sandbox. The contracts are unaudited.</span></li>
         <li><b>Pictures are not evidence.</b><span>The photographs are decorative. They are not the radar scene.</span></li>
       </ul>
@@ -415,7 +418,7 @@ function dataDesk() {
   return deskLayout(
     "data",
     "Where rain and radar disagreed",
-    "Same CSVs as the scorer. Radar is the reference for this check, not ground truth. No gauges. Not a flood forecast.",
+    "Same CSVs as the scorer. Radar is the reference for this check, not ground truth. There is no gauge file in this repository. We do not stub TAHMO or Kenya Met stations. Not a flood forecast.",
     `<ul class="stats">
       <li><div><p class="n rain">${esc(rain.mm ?? "—")} mm</p><p>One catchment, ${esc(rain.product || "CHIRPS")}. Line ${esc(rain.line_mm ?? 40)} mm / ${esc(rain.window_days ?? 3)} days.</p></div></li>
       <li><div><p class="n radar">${radar.signed ?? 0}</p><p>Radar signed. ${radar.below ?? 0} under the line. ${radar.no_geometry ?? 0} not measured.</p></div></li>
@@ -425,7 +428,7 @@ function dataDesk() {
       <thead><tr><th>Place</th><th>Radar</th><th>Open water</th><th>Rain</th><th>Geometry</th><th>Land pixels</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <p class="note">Four OSM boxes only. We do not invent a box. <a href="/data/radar_fractions.csv">radar_fractions.csv</a> · <a href="/data/observations.csv">observations.csv</a></p>`,
+    <p class="note">Four OSM boxes only. We do not invent a box. Disagreement is the reliability check we can do today: they do not always agree. A later gauge file can sit beside this table. Until then, do not treat radar as truth. <a href="/data/radar_fractions.csv">radar_fractions.csv</a> · <a href="/data/observations.csv">observations.csv</a></p>`
   );
 }
 
@@ -438,7 +441,7 @@ function insurerDesk() {
   return deskLayout(
     "insurer",
     `Rain would have paid ${rainYes}. This rule paid ${paid}.`,
-    "For each named place this week: whether radar and rainfall agreed, who signed, and whether anything was disputed. Use the counts to design a trigger. This is not a certified insurance product and not an accuracy figure.",
+    "For each named place this week: whether radar and rainfall agreed, who signed, and whether anything was disputed. Use the counts to design a trigger. This is not a certified insurance product, not an accuracy figure, and not a claim that we missed fewer floods than rain.",
     `<ul class="stats">
       <li><div><p class="n">${rule.hits ?? paid}</p><p>This rule found</p></div></li>
       <li><div><p class="n">${rule.misses ?? "—"}</p><p>This rule missed</p></div></li>
@@ -735,25 +738,35 @@ function showResponder(slug) {
 
 function researchDesk() {
   const rule = cache?.rule || {};
+  const rainYes = cache?.rainfall?.signed ?? 7;
+  const paid = (cache?.places || []).filter((p) => p.both === "yes").length;
+  const misses = cache?.counts?.misses || {};
   return deskLayout(
     "research",
-    "An open method you can rerun",
-    "Frozen rule, label log, counts. One week. Indicative, not a finished validation study. No machine learning. Do not tune thresholds on this season.",
+    `Rain signed ${rainYes}. The rule paid ${paid}.`,
+    "That is the finding. Counts and miss reasons, one week, one frozen rule. Indicative, not a validation study. No machine learning. Do not tune thresholds on this season. Radar is the reference for the check, not ground truth.",
     `<ul class="stats">
-      <li><div><p class="n">${esc(rule.frozen_on || "—")}</p><p>Rule frozen. Hash ${esc(rule.thresholds_hash || "")}</p></div></li>
+      <li><div><p class="n rain">${rainYes}</p><p>Rain signed “flood”</p></div></li>
+      <li><div><p class="n radar">${paid}</p><p>Both signed, so a claim may open</p></div></li>
+      <li><div><p class="n">${misses.below_threshold ?? 0}</p><p>Missed: radar under the line</p></div></li>
+      <li><div><p class="n">${misses.no_geometry ?? 0}</p><p>Missed: no outline, radar not run</p></div></li>
     </ul>
+    <p class="note">False triggers stay 0: no “did not flood” labels. Misses from a missing satellite pass: ${misses.no_scene ?? 0}. The 6 May scene existed. We do not claim the data is reliable, that anyone will use this, or that farmers are better off.</p>
     <p class="cta">
       <a class="btn primary" href="/method">Method</a>
       <a class="btn" href="/backtest">Backtest</a>
       <a class="btn" href="/claims">Claims</a>
     </p>
     <ul class="limits">
-      <li><b><a href="/data/counts.csv">counts.csv</a></b><span>Found, missed, false. False stays 0: no dry labels.</span></li>
+      <li><b><a href="/data/counts.csv">counts.csv</a></b><span>Found, missed, false, and every miss reason.</span></li>
       <li><b><a href="/data/label_log.csv">label_log.csv</a></b><span>The seven names and the reports.</span></li>
-      <li><b><a href="/data/rule.yaml">rule.yaml</a></b><span>Byte for byte. That file’s hash is in every claim id.</span></li>
+      <li><b><a href="/data/rule.yaml">rule.yaml</a></b><span>Byte for byte. That file’s hash is in every claim id. Frozen on ${esc(rule.frozen_on || "")}.</span></li>
     </ul>
-    <pre class="cmd"><code>python -m backtest.score
-python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror</code></pre>`,
+    <p class="lede">How a new week is scored. Offline. The site does not download a GeoTIFF.</p>
+    <pre class="cmd"><code>python -m backtest.week --recipe
+python -m backtest.week
+python -m unittest backtest.test_score backtest.test_week backtest.pipeline.test_pipeline watcher.test_mirror</code></pre>
+    <p class="note">A second week is allowed only if <code>config/rule.yaml</code> stays unchanged. There is no gauge file here. Do not stub stations.</p>`,
   );
 }
 
@@ -1140,7 +1153,7 @@ function farmerDesk() {
     <section class="block tight farmer-head"><div class="wrap">
       <p class="eyebrow">${esc(weekLabel())} · Nyando · smallholders and pastoralists</p>
       <h1>A short message on a small phone.</h1>
-      <p class="lede">An insurer or a responder holds this phone up. Farmers do not use this website. The screen says yes, no, or we could not look. If money were sent in this demo, the screen would say it is only a practice message. No money has been sent.</p>
+      <p class="lede">An insurer or a responder holds this phone up. Farmers do not use this website. The screen says yes, no, or we could not look. That is a reason you can check, not advice to plant, move, or ignore Kenya Met. If money were sent in this demo, the screen would say it is only a practice message. No money has been sent.</p>
       <div class="phone-stage">
         <div class="handset" role="group" aria-label="Feature phone">
           <div class="handset-ear"></div>
@@ -1182,7 +1195,7 @@ function farmerDesk() {
           </ol>
           <div data-phone-detail></div>
           <p class="note" data-sandbox><b>SANDBOX.</b> This demo sends no M-PESA. No Daraja call. No shillings moved. If a testnet release happens, the record stays labelled SANDBOX.</p>
-          <p class="note">On a yes, the practice amount is 0.001 test ETH for the whole place, from the committed table. It is not shillings for one farmer, and nothing has been sent. Where a news report named homes, the shilling figure is a house-damage guess for all of those homes together. It is not a payment, and not money for seed. Water under a crop may not show on the satellite. If nothing arrives, ask the person holding the phone.</p>
+          <p class="note">On a yes, the practice amount is 0.001 test ETH for the whole place, from the committed table. It is not shillings for one farmer, and nothing has been sent. Where a news report named homes, the shilling figure is a house-damage guess for all of those homes together. It is not a payment, and not money for seed. Water under a crop may not show on the satellite. This page does not replace a Kenya Met forecast. If nothing arrives, ask the person holding the phone.</p>
         </aside>
       </div>
     </div></section>

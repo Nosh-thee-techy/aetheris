@@ -10,3 +10,7 @@ agreement,radar_abstain,,,,3
 agreement,rainfall_abstain,,,,0
 agreement,both_abstain,,,,0
 miss,no_scene,,0,,0
+miss,below_threshold,,3,,3
+miss,uncorroborated,,0,,0
+miss,rainfall_gap,,0,,0
+miss,no_geometry,,3,,3

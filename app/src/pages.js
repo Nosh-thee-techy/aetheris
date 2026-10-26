@@ -86,7 +86,7 @@ export function methodPage(ctx) {
     <section class="block alt"><div class="wrap">
       <div class="sec-head"><span class="num">01</span><h2>When the data misses the flood, nobody can see why</h2></div>
       <p class="lede">Smallholder farmers and pastoralists in flood-prone basins are paid by weather-index insurance, or helped by alerts, only when the data says a flood happened. When that data misses their flood they get nothing, and the decision was made by a single operator, from an estimate, with no reason attached.</p>
-      <p class="note">Aetheris attaches the reason. Each decision shows what each source measured, against which line, and who signed. It also counts how often the data misses real floods. Today the benefit to farmers is indirect, and every payout in this demo is on a testnet or a sandbox.</p>
+      <p class="note">Aetheris attaches the reason. Each decision shows what each source measured, against which line, and who signed. It also counts how often the two sources miss a reported flood. That count is not “farmers are better off,” and we have not shown that anyone will use this. Today every payout in this demo is on a testnet or a sandbox.</p>
       <h3>What the research says</h3>
       <ul class="limits">
         <li><b>Ground stations are few.</b><span>Africa’s average density of stations meeting WMO standards is eight times below the recommended level, and as of October 2024 Chad was reporting 3% of the surface observations it is required to. <a href="https://eos.org/features/building-better-weather-networks">Eos</a></span></li>
@@ -127,19 +127,22 @@ export function methodPage(ctx) {
     <section class="block"><div class="wrap">
       <div class="sec-head"><span class="num">04</span><h2>How it is built</h2></div>
       <ol class="steps">
-        <li><b>Sources.</b> Sentinel-1 radar (RTC), CHIRPS rainfall, JRC permanent water. Read by hand for one week.</li>
+        <li><b>Sources.</b> Sentinel-1 radar (RTC), CHIRPS rainfall, JRC permanent water. Read offline for one week.</li>
         <li><b>Frozen rule.</b> <code>config/rule.yaml</code>. Its hash is part of every claim id. Frozen, hash on the testnet.</li>
+        <li><b>Offline week job.</b> Scene → radar CSV → rainfall rows → <code>python -m backtest.week</code>. The website reads those files. It does not download a GeoTIFF, and it does not run a RAG.</li>
         <li><b>FloodTrigger and PayoutEscrow.</b> Deployed on Sepolia. Unaudited. Beneficiaries are placeholders.</li>
         <li><b>M-PESA mirror.</b> A function that writes a record labelled SANDBOX. No Daraja call is made.</li>
       </ol>
-      <p class="note">Not built: a committee or vote for the referee (one named key decides today), a ground-gauge attester, IMERG rainfall, and any check that real people want this.</p>
+      <p class="note">Not built: a committee or vote for the referee (one named key decides today), a ground-gauge attester, IMERG rainfall, live raster ingest on page load, and any check that real people want this. A second week is allowed only if the rule file is unchanged.</p>
     </div></section>
     <section class="block alt"><div class="wrap">
       <div class="sec-head"><span class="num">05</span><h2>What we are not claiming</h2></div>
       <ul class="limits">
-        <li><b>Radar has blind spots.</b><span>It sees open water. It does not see flood under crops, trees or buildings, and Sentinel-1’s 2024 revisit is twelve days.</span></li>
+        <li><b>Radar has blind spots.</b><span>It sees open water. It does not see flood under crops, trees or buildings, and Sentinel-1’s 2024 revisit is twelve days. Radar is the reference for this check, not ground truth.</span></li>
         <li><b>The sources overlap.</b><span>Rainfall and radar describe the same storm. Two signatures are not two independent witnesses.</span></li>
-        <li><b>One season, seven news reports.</b><span>Counts here are indicative. Reports favour places that reporters and rescuers could reach. There are no “did not flood” labels yet.</span></li>
+        <li><b>One season, seven news reports.</b><span>Counts here are indicative, not a validation study. Reports favour places that reporters and rescuers could reach. There are no “did not flood” labels yet.</span></li>
+        <li><b>No gauges, and none stubbed.</b><span>There is no TAHMO or Kenya Met file in this repository. Do not invent stations.</span></li>
+        <li><b>We do not prove use or impact.</b><span>The farmer page is a reason you can check: yes, no, or we could not look. It is not advice to plant, move, or ignore Kenya Met.</span></li>
         <li><b>Payouts are not real.</b><span>The escrow holds testnet ETH. M-PESA is a Daraja sandbox. The contracts are unaudited.</span></li>
       </ul>
     </div></section>
@@ -271,13 +274,14 @@ export function backtestPage(ctx) {
     </div></section>
     <section class="block"><div class="wrap">
       <div class="sec-head"><span class="num">04</span><h2>Reproduce it</h2></div>
-      <pre class="cmd"><code>python -m backtest.score
-python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror
+      <pre class="cmd"><code>python -m backtest.week --recipe
+python -m backtest.week
+python -m unittest backtest.test_score backtest.test_week backtest.pipeline.test_pipeline watcher.test_mirror
 cd app
 npm install
 npm run build
 python web/server.py</code></pre>
-      <p class="note">The radar fractions come from <code>backtest/checks/radar_fraction.py</code>, which needs network access to Microsoft Planetary Computer. The scored result does not depend on rerunning it: the measured values are in the CSV above.</p>
+      <p class="note">The radar fractions come from <code>backtest/checks/radar_fraction.py</code>, which needs network access to Microsoft Planetary Computer. The site does not run that script. The scored result does not depend on rerunning it: the measured values are in the CSV above. A second week is allowed only if <code>config/rule.yaml</code> stays unchanged.</p>
     </div></section>
     <section class="block alt"><div class="wrap">
       <div class="sec-head"><span class="num">05</span><h2>What this cannot tell you</h2></div>

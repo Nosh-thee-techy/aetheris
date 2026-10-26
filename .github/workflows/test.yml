@@ -17,7 +17,7 @@ jobs:
           node-version: "22"
       - run: npm ci && npm run build
         working-directory: app
-      - run: python -m unittest backtest.test_score backtest.pipeline.test_pipeline backtest.pipeline.test_damage watcher.test_mirror web.test_build web.test_server
+      - run: python -m unittest backtest.test_score backtest.test_week backtest.pipeline.test_pipeline backtest.pipeline.test_damage watcher.test_mirror web.test_build web.test_server
 
   contract:
     runs-on: ubuntu-latest

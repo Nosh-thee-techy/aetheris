@@ -136,11 +136,12 @@ forge test --root contracts
 Backtest tests use the Python standard library:
 
 ```powershell
-python -m unittest backtest.test_score backtest.pipeline.test_pipeline watcher.test_mirror web.test_build web.test_server
-python -m backtest.score
+python -m unittest backtest.test_score backtest.test_week backtest.pipeline.test_pipeline watcher.test_mirror web.test_build web.test_server
+python -m backtest.week --recipe
+python -m backtest.week
 ```
 
-`python -m backtest.score` reads `labels/label_log.csv` and writes `backtest/results/counts.csv`. The notebook `backtest/agreement.ipynb` runs the same scorer.
+`python -m backtest.week` is the documented job: print the recipe (scene → radar CSV → rainfall rows → score), then score the published files. `python -m backtest.score` is the scorer alone. Both read `labels/label_log.csv` and write `backtest/results/counts.csv`, including every miss reason. The website reads those CSVs. It does not download a GeoTIFF. The notebook `backtest/agreement.ipynb` runs the same scorer. A second week is allowed only if `config/rule.yaml` is unchanged. There is no gauge file; do not stub stations.
 
 ### The site
 
